@@ -1,10 +1,10 @@
 import { getNonDeletedElements } from "@excalidraw/element";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import { isLinearElement, isTextElement } from "@excalidraw/element/typeChecks";
+import { LinearElementEditor } from "@excalidraw/element";
+import { isLinearElement, isTextElement } from "@excalidraw/element";
 
 import { arrayToMap, KEYS } from "@excalidraw/common";
 
-import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

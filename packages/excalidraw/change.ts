@@ -12,36 +12,30 @@ import {
   BindableElement,
   bindingProperties,
   updateBoundElements,
-} from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+} from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { mutateElement, newElementWith } from "@excalidraw/element";
 import {
   getBoundTextElementId,
   redrawTextBoundingBox,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
 import {
   hasBoundTextElement,
   isBindableElement,
   isBoundToContainer,
   isImageElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { getNonDeletedGroupIds } from "@excalidraw/element/groups";
+import { getNonDeletedGroupIds } from "@excalidraw/element";
 
-import {
-  orderByFractionalIndex,
-  syncMovedIndices,
-} from "@excalidraw/element/fractionalIndex";
+import { orderByFractionalIndex, syncMovedIndices } from "@excalidraw/element";
 
-import Scene from "@excalidraw/element/Scene";
+import { Scene } from "@excalidraw/element";
 
-import type { BindableProp, BindingProp } from "@excalidraw/element/binding";
+import type { BindableProp, BindingProp } from "@excalidraw/element";
 
-import type { ElementUpdate } from "@excalidraw/element/mutateElement";
+import type { ElementUpdate } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

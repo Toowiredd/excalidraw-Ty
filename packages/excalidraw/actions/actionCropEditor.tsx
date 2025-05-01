@@ -1,4 +1,4 @@
-import { isImageElement } from "@excalidraw/element/typeChecks";
+import { isImageElement } from "@excalidraw/element";
 
 import type { ExcalidrawImageElement } from "@excalidraw/element/types";
 

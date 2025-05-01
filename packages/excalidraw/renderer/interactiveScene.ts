@@ -19,47 +19,44 @@ import {
   BINDING_HIGHLIGHT_OFFSET,
   BINDING_HIGHLIGHT_THICKNESS,
   maxBindingGap,
-} from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+} from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
   getTransformHandles,
   getTransformHandlesFromCoords,
   shouldShowBoundingBox,
-} from "@excalidraw/element/transformHandles";
+} from "@excalidraw/element";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { getCornerRadius } from "@excalidraw/element/shapes";
+import { getCornerRadius } from "@excalidraw/element";
 
-import { renderSelectionElement } from "@excalidraw/element/renderElement";
+import { renderSelectionElement } from "@excalidraw/element";
 
 import {
   isSelectedViaGroup,
   getSelectedGroupIds,
   getElementsInGroup,
   selectGroupsFromGivenElements,
-} from "@excalidraw/element/groups";
+} from "@excalidraw/element";
 
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   SuggestedBinding,
   SuggestedPointBinding,
-} from "@excalidraw/element/binding";
+} from "@excalidraw/element";
 
 import type {
   TransformHandles,
   TransformHandleType,
-} from "@excalidraw/element/transformHandles";
+} from "@excalidraw/element";
 
 import type {
   ElementsMap,

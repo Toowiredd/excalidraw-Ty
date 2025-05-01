@@ -67,7 +67,7 @@ import {
 
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { Bounds } from "./bounds";
 import type {

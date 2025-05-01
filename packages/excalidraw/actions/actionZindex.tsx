@@ -5,7 +5,7 @@ import {
   moveOneRight,
   moveAllLeft,
   moveAllRight,
-} from "@excalidraw/element/zindex";
+} from "@excalidraw/element";
 
 import {
   BringForwardIcon,

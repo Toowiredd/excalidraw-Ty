@@ -1,5 +1,5 @@
-import { isTextElement } from "@excalidraw/element/typeChecks";
-import { getTextFromElements } from "@excalidraw/element/textElement";
+import { isTextElement } from "@excalidraw/element";
+import { getTextFromElements } from "@excalidraw/element";
 
 import { CODES, KEYS, isFirefox } from "@excalidraw/common";
 

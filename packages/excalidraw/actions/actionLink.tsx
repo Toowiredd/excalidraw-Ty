@@ -1,4 +1,4 @@
-import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
+import { isEmbeddableElement } from "@excalidraw/element";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 

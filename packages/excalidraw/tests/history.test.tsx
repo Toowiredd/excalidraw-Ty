@@ -8,7 +8,7 @@ import {
 import { vi } from "vitest";
 import { pointFrom } from "@excalidraw/math";
 
-import { newElementWith } from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element";
 
 import {
   EXPORT_DATA_TYPES,

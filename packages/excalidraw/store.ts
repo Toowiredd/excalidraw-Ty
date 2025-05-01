@@ -1,8 +1,8 @@
 import { isDevEnv, isShallowEqual, isTestEnv } from "@excalidraw/common";
 
-import { deepCopyElement } from "@excalidraw/element/duplicate";
+import { deepCopyElement } from "@excalidraw/element";
 
-import { newElementWith } from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element";
 
 import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 
