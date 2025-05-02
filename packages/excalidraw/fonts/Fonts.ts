@@ -28,7 +28,7 @@ import type {
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import { CascadiaFontFaces } from "./Cascadia";
 import { ComicShannsFontFaces } from "./ComicShanns";

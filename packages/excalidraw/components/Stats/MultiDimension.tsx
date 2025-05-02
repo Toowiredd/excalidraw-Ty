@@ -19,7 +19,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import DragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";

@@ -68,7 +68,7 @@ import type {
   VerticalAlign,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";

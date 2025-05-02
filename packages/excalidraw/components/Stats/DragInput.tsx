@@ -7,7 +7,7 @@ import { deepCopyElement } from "@excalidraw/element";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "../../store";
 import { useApp } from "../App";

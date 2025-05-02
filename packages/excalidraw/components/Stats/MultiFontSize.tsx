@@ -12,7 +12,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import { fontSizeIcon } from "../icons";
 

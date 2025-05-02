@@ -9,7 +9,7 @@ import {
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";

@@ -10,7 +10,7 @@ import { isImageElement } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";

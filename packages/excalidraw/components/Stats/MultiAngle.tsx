@@ -9,7 +9,7 @@ import type { Degrees } from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import { angleIcon } from "../icons";
 

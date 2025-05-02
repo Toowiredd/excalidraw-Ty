@@ -7,7 +7,7 @@ import { getCommonBounds } from "@excalidraw/element";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import StatsDragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";

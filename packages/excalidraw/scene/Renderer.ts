@@ -9,7 +9,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
 import { renderStaticSceneThrottled } from "../renderer/staticScene";

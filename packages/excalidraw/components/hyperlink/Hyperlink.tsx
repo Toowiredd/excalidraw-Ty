@@ -28,7 +28,7 @@ import {
 
 import { isEmbeddableElement } from "@excalidraw/element";
 
-import type Scene from "@excalidraw/element";
+import type { Scene } from "@excalidraw/element";
 
 import type {
   ElementsMap,
