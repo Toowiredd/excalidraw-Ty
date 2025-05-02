@@ -231,6 +231,9 @@ const drawHighlightForRectWithRotation = (
     drawCatmullRomQuadraticApprox(context, topLeftApprox);
   }
 
+  // Counter-clockwise for the cutout in the middle. We need to have an "inverse
+  // mask" on a filled shape for the diamond highlight, because stroking creates
+  // sharp inset edges on line joins < 90 degrees.
   {
     const topLeftApprox = offsetQuadraticBezier(
       pointFrom(0 + radius, 0),
@@ -485,13 +488,7 @@ const renderBindingHighlightForBindableElement = (
 
   context.strokeStyle = "rgba(0,0,0,.05)";
   context.fillStyle = "rgba(0,0,0,.05)";
-  // When zooming out, make line width greater for visibility
-  context.lineWidth = maxBindingGap(
-    element,
-    element.width,
-    element.height,
-    zoom,
-  );
+
   // To ensure the binding highlight doesn't overlap the element itself
   const padding = maxBindingGap(element, element.width, element.height, zoom);
 
@@ -509,10 +506,14 @@ const renderBindingHighlightForBindableElement = (
       drawHighlightForDiamondWithRotation(context, padding, element);
       break;
     case "ellipse":
+      context.lineWidth =
+        maxBindingGap(element, element.width, element.height, zoom) -
+        FIXED_BINDING_DISTANCE;
+
       strokeEllipseWithRotation(
         context,
-        width + padding * 2,
-        height + padding * 2,
+        width + padding + FIXED_BINDING_DISTANCE,
+        height + padding + FIXED_BINDING_DISTANCE,
         x1 + width / 2,
         y1 + height / 2,
         element.angle,
