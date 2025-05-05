@@ -108,19 +108,15 @@ export class Store {
     action: CaptureUpdateActionType,
     elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined = undefined,
-    /** delta is only relevant for `CaptureUpdateAction.IMMEDIATELY`, as it's the only action producing `DurableStoreIncrement` containing a delta and it's also expected to be immutable! */
+    /**
+     * delta is only relevant for `CaptureUpdateAction.IMMEDIATELY` (but not required!),
+     * as it's the only action producing `DurableStoreIncrement` containing a delta
+     */
     delta: StoreDelta | undefined = undefined,
   ) {
-    // create a snapshot first, so that it couldn't mutate in the meantime
-    const snapshot = this.maybeCloneSnapshot(action, elements, appState);
-
-    if (!snapshot) {
-      return;
-    }
-
-    this.scheduledMicroActions.push(() =>
-      this.executeAction(action, snapshot, delta),
-    );
+    this.scheduledMicroActions.push(() => {
+      return this.processAction(action, elements, appState, delta);
+    });
   }
 
   /**
@@ -140,7 +136,9 @@ export class Store {
     try {
       // execute a single scheduled "macro" function
       // similar to macro tasks, there can be only one within a single commit (loop)
-      this.processMacroAction(elements, appState);
+      const macroAction = this.getScheduledMacroAction();
+      this.processAction(macroAction, elements, appState);
+      
     } finally {
       this.satisfiesScheduledActionsInvariant();
       // defensively reset all scheduled "macro" actions, possibly cleans up other runtime garbage
@@ -195,42 +193,6 @@ export class Store {
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
-  }
-
-  /**
-   * Executes the incoming `CaptureUpdateAction`, emits the corresponding `StoreIncrement` and maybe updates the snapshot.
-   *
-   * @emits StoreIncrement
-   */
-  private executeAction(
-    action: CaptureUpdateActionType,
-    snapshot: StoreSnapshot,
-    delta: StoreDelta | undefined = undefined,
-  ) {
-    try {
-      switch (action) {
-        // only immediately emits a durable increment
-        case CaptureUpdateAction.IMMEDIATELY:
-          this.emitDurableIncrement(snapshot, delta);
-          break;
-        // both never and eventually emit an ephemeral increment
-        case CaptureUpdateAction.NEVER:
-        case CaptureUpdateAction.EVENTUALLY:
-          this.emitEphemeralIncrement(snapshot);
-          break;
-        default:
-          assertNever(action, `Unknown store action`);
-      }
-    } finally {
-      // update the snapshot no-matter what, as it would mess up with the next action
-      switch (action) {
-        // both immediately and never update the snapshot, unlike eventually
-        case CaptureUpdateAction.IMMEDIATELY:
-        case CaptureUpdateAction.NEVER:
-          this.snapshot = snapshot;
-          break;
-      }
-    }
   }
 
   /**
@@ -317,38 +279,59 @@ export class Store {
         console.error(`Failed to execute scheduled micro action`, error);
       }
     }
+
+    this.scheduledMicroActions = [];
   }
 
-  private processMacroAction(
+  private processAction(
+    action: CaptureUpdateActionType,
     elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined,
+    delta: StoreDelta | undefined = undefined,
   ) {
-    const macroAction = this.getScheduledMacroAction();
-
     // perf. optimisation, since "EVENTUALLY" does not update the snapshot,
     // so if nobody is listening for increments, we don't need to even clone the snapshot
     // as it's only needed for `StoreChange` computation inside `EphemeralIncrement`
     if (
-      macroAction === CaptureUpdateAction.EVENTUALLY &&
+      action === CaptureUpdateAction.EVENTUALLY &&
       !this.onStoreIncrementEmitter.subscribers.length
     ) {
       return;
     }
 
-    const nextSnapshot = this.maybeCloneSnapshot(
-      macroAction,
-      elements,
-      appState,
-    );
+    const nextSnapshot = this.maybeCloneSnapshot(action, elements, appState);
 
     if (!nextSnapshot) {
       // don't continue if there is not change detected
       return;
     }
 
-    // execute a single scheduled "macro" function
-    // similar to macro tasks, there can be only one within a single commit
-    this.executeAction(macroAction, nextSnapshot);
+    console.log("processAction", action);
+
+    try {
+      switch (action) {
+        // only immediately emits a durable increment
+        case CaptureUpdateAction.IMMEDIATELY:
+          this.emitDurableIncrement(nextSnapshot, delta);
+          break;
+        // both never and eventually emit an ephemeral increment
+        case CaptureUpdateAction.NEVER:
+        case CaptureUpdateAction.EVENTUALLY:
+          this.emitEphemeralIncrement(nextSnapshot);
+          break;
+        default:
+          assertNever(action, `Unknown store action`);
+      }
+    } finally {
+      // update the snapshot no-matter what, as it would mess up with the next action
+      switch (action) {
+        // both immediately and never update the snapshot, unlike eventually
+        case CaptureUpdateAction.IMMEDIATELY:
+        case CaptureUpdateAction.NEVER:
+          this.snapshot = nextSnapshot;
+          break;
+      }
+    }
   }
 
   /**
