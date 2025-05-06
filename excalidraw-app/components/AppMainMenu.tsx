@@ -86,6 +86,15 @@ export const AppMainMenu: React.FC<{
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>
       <MainMenu.DefaultItems.ChangeCanvasBackground />
+      <MainMenu.Separator />
+      <MainMenu.Item
+        icon={eyeIcon}
+        onClick={() => {
+          // Placeholder for AI tool menu item action
+        }}
+      >
+        AI Tools
+      </MainMenu.Item>
     </MainMenu>
   );
 });

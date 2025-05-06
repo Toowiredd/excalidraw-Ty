@@ -123,6 +123,8 @@ export interface CollabAPI {
   getUsername: CollabInstance["getUsername"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
   setCollabError: CollabInstance["setErrorDialog"];
+  handleNLPTask: CollabInstance["handleNLPTask"];
+  handleImageRecognition: CollabInstance["handleImageRecognition"];
 }
 
 interface CollabProps {
@@ -237,6 +239,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       getUsername: this.getUsername,
       getActiveRoomLink: this.getActiveRoomLink,
       setCollabError: this.setErrorDialog,
+      handleNLPTask: this.handleNLPTask,
+      handleImageRecognition: this.handleImageRecognition,
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -997,6 +1001,24 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.setState({
       errorMessage,
     });
+  };
+
+  handleNLPTask = async (text: string) => {
+    try {
+      const result = await AIService.performNLPTask(text);
+      console.log("NLP Task Result:", result);
+    } catch (error) {
+      console.error("NLP Task Error:", error);
+    }
+  };
+
+  handleImageRecognition = async (image: HTMLImageElement) => {
+    try {
+      const result = await AIService.performImageRecognition(image);
+      console.log("Image Recognition Result:", result);
+    } catch (error) {
+      console.error("Image Recognition Error:", error);
+    }
   };
 
   render() {

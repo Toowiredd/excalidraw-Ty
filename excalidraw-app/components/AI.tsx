@@ -7,6 +7,7 @@ import {
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
+import AIService from "../services/aiService";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
@@ -15,6 +16,24 @@ export const AIComponents = ({
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI;
 }) => {
+  const handleNLPTask = async (text: string) => {
+    try {
+      const result = await AIService.performNLPTask(text);
+      console.log("NLP Task Result:", result);
+    } catch (error) {
+      console.error("NLP Task Error:", error);
+    }
+  };
+
+  const handleImageRecognition = async (image: HTMLImageElement) => {
+    try {
+      const result = await AIService.performImageRecognition(image);
+      console.log("Image Recognition Result:", result);
+    } catch (error) {
+      console.error("Image Recognition Error:", error);
+    }
+  };
+
   return (
     <>
       <DiagramToCodePlugin
@@ -155,6 +174,35 @@ export const AIComponents = ({
           }
         }}
       />
+
+      <div>
+        <h3>AI Tools</h3>
+        <div>
+          <label htmlFor="nlpInput">NLP Task:</label>
+          <input
+            type="text"
+            id="nlpInput"
+            placeholder="Enter text for NLP task"
+            onBlur={(e) => handleNLPTask(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="imageInput">Image Recognition:</label>
+          <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => handleImageRecognition(img);
+              }
+            }}
+          />
+        </div>
+      </div>
     </>
   );
 };

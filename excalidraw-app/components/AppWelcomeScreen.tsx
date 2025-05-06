@@ -43,6 +43,9 @@ export const AppWelcomeScreen: React.FC<{
       </WelcomeScreen.Hints.MenuHint>
       <WelcomeScreen.Hints.ToolbarHint />
       <WelcomeScreen.Hints.HelpHint />
+      <WelcomeScreen.Hints.CustomHint>
+        {t("welcomeScreen.app.customHint")}
+      </WelcomeScreen.Hints.CustomHint>
       <WelcomeScreen.Center>
         <WelcomeScreen.Center.Logo />
         <WelcomeScreen.Center.Heading>
@@ -67,6 +70,15 @@ export const AppWelcomeScreen: React.FC<{
               Sign up
             </WelcomeScreen.Center.MenuItemLink>
           )}
+          <WelcomeScreen.Center.MenuItemLink
+            href={`${
+              import.meta.env.VITE_APP_PLUS_LP
+            }/ai-tools?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenAI`}
+            shortcut={null}
+            icon={loginIcon}
+          >
+            AI Tools
+          </WelcomeScreen.Center.MenuItemLink>
         </WelcomeScreen.Center.Menu>
       </WelcomeScreen.Center>
     </WelcomeScreen>
