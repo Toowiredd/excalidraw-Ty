@@ -4,16 +4,22 @@ import AIService from '../services/aiService';
 const AIIntegration: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [result, setResult] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<string>('defaultModel');
+  const [selectedModel, setSelectedModel] = useState<string>(''); // Initialize to empty string
 
   const handlePrediction = async () => {
     try {
-      if (!canvasRef.current) throw new Error('Canvas not found');
-      await AIService.loadModel(`/path/to/${selectedModel}.json`); // Update model path
-      const prediction = await AIService.predict(canvasRef.current);
+      if (!canvasRef.current) throw new Error("Canvas not found");
+      if (!selectedModel) { // selectedModel will now be the URL
+        setResult("Error: No model selected or model URL is invalid.");
+        return;
+      }
+      // Use the selectedModel URL directly, and use it as the modelName key too for simplicity here
+      await AIService.loadModel(selectedModel, selectedModel);
+      const prediction = await AIService.predict(canvasRef.current, selectedModel); // Pass selectedModel as modelName
       setResult(JSON.stringify(prediction));
-    } catch (error) {
-      console.error('AI Integration Error:', error);
+    } catch (error: any) {
+      console.error("AI Integration Error:", error);
+      setResult(`Error: ${error.message || "Prediction failed"}`);
     }
   };
 
@@ -27,9 +33,10 @@ const AIIntegration: React.FC = () => {
           value={selectedModel}
           onChange={(e) => setSelectedModel(e.target.value)}
         >
-          <option value="defaultModel">Default Model</option>
-          <option value="model1">Model 1</option>
-          <option value="model2">Model 2</option>
+          <option value="">Select a Model</option>
+          <option value="https://example.com/models/defaultModel/model.json">Default Model (Placeholder URL)</option>
+          <option value="https://example.com/models/model1/model.json">Model 1 (Placeholder URL)</option>
+          <option value="https://example.com/models/model2/model.json">Model 2 (Placeholder URL)</option>
         </select>
       </div>
       <button onClick={handlePrediction}>Run AI</button>
