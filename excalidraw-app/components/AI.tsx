@@ -8,6 +8,7 @@ import {
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
 import AIService from "../services/aiService";
+import React, { useState } from "react";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
@@ -16,20 +17,41 @@ export const AIComponents = ({
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI;
 }) => {
+  const [nlpResult, setNlpResult] = useState<any>(null);
+  const [nlpError, setNlpError] = useState<string | null>(null);
+  const [imageRecResult, setImageRecResult] = useState<any>(null);
+  const [imageRecError, setImageRecError] = useState<string | null>(null);
+
   const handleNLPTask = async (text: string) => {
+    setNlpResult(null);
+    setNlpError(null);
+    if (!text.trim()) {
+      setNlpError("Input text cannot be empty.");
+      return;
+    }
     try {
       const result = await AIService.performNLPTask(text);
+      setNlpResult(result.entities); // Assuming result has entities property
       console.log("NLP Task Result:", result);
-    } catch (error) {
+    } catch (error: any) {
+      setNlpError(error.message || "An unexpected error occurred.");
       console.error("NLP Task Error:", error);
     }
   };
 
   const handleImageRecognition = async (image: HTMLImageElement) => {
+    setImageRecResult(null);
+    setImageRecError(null);
+    if (!image) {
+      setImageRecError("No image provided.");
+      return;
+    }
     try {
       const result = await AIService.performImageRecognition(image);
+      setImageRecResult(result.objects); // Assuming result has objects property
       console.log("Image Recognition Result:", result);
-    } catch (error) {
+    } catch (error: any) {
+      setImageRecError(error.message || "An unexpected error occurred.");
       console.error("Image Recognition Error:", error);
     }
   };
@@ -185,6 +207,8 @@ export const AIComponents = ({
             placeholder="Enter text for NLP task"
             onBlur={(e) => handleNLPTask(e.target.value)}
           />
+          {nlpError && <div style={{ color: 'red' }}>Error: {nlpError}</div>}
+          {nlpResult && <div>Result: {JSON.stringify(nlpResult)}</div>}
         </div>
         <div>
           <label htmlFor="imageInput">Image Recognition:</label>
@@ -201,6 +225,8 @@ export const AIComponents = ({
               }
             }}
           />
+          {imageRecError && <div style={{ color: 'red' }}>Error: {imageRecError}</div>}
+          {imageRecResult && <div>Result: {JSON.stringify(imageRecResult)}</div>}
         </div>
       </div>
     </>
