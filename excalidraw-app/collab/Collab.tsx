@@ -468,8 +468,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   };
 
-  private fallbackInitializationHandler: null | (() => any) = null;
-
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ) => {
@@ -511,16 +509,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       /* webpackChunkName: "socketIoClient" */ "socket.io-client"
     );
 
-    const fallbackInitializationHandler = () => {
-      this.initializeRoom({
-        roomLinkData: existingRoomLinkData,
-        fetchScene: true,
-      }).then((scene) => {
-        scenePromise.resolve(scene);
-      });
-    };
-    this.fallbackInitializationHandler = fallbackInitializationHandler;
-
     try {
       this.portal.socket = this.portal.open(
         socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
@@ -529,8 +517,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         roomId,
         roomKey,
       );
-
-      this.portal.socket.once("connect_error", fallbackInitializationHandler);
     } catch (error: any) {
       console.error(error);
       this.setErrorDialog(error.message);
@@ -559,7 +545,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     // fallback in case you're not alone in the room but still don't receive
     // initial SCENE_INIT message
     this.socketInitializationTimer = window.setTimeout(
-      fallbackInitializationHandler,
+      () => {
+        this.initializeRoom({
+          roomLinkData: existingRoomLinkData,
+          fetchScene: true,
+        }).then((scene) => {
+          scenePromise.resolve(scene);
+        });
+      },
       INITIAL_SCENE_UPDATE_TIMEOUT,
     );
 
@@ -708,12 +701,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       }
     | { fetchScene: false; roomLinkData?: null }) => {
     clearTimeout(this.socketInitializationTimer!);
-    if (this.portal.socket && this.fallbackInitializationHandler) {
-      this.portal.socket.off(
-        "connect_error",
-        this.fallbackInitializationHandler,
-      );
-    }
     if (fetchScene && roomLinkData && this.portal.socket) {
       this.excalidrawAPI.resetScene();
 

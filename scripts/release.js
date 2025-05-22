@@ -15,12 +15,13 @@ const publish = () => {
     console.info("Publishing the package...");
     execSync(`yarn --cwd ${excalidrawDir} publish`);
   } catch (error) {
-    console.error(error);
+    console.error("Error during release process:", error);
     process.exit(1);
   }
 };
 
 const release = () => {
+  console.info("Starting release process...");
   publish();
   console.info(`Published ${pkg.version}!`);
 };
