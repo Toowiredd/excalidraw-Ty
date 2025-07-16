@@ -68,6 +68,7 @@ import {
   getCollaborationLink,
   getSyncableElements,
 } from "../data";
+import AIService from "../services/aiService";
 import {
   encodeFilesForUpload,
   FileManager,
@@ -368,12 +369,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       ),
     );
 
-    if (this.portal.socket && this.fallbackInitializationHandler) {
-      this.portal.socket.off(
-        "connect_error",
-        this.fallbackInitializationHandler,
-      );
-    }
 
     if (!keepRemoteState) {
       LocalData.fileStorage.reset();

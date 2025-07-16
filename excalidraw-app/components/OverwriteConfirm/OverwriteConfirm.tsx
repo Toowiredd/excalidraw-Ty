@@ -3,39 +3,41 @@ import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
 import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
 import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { overwriteConfirmStateAtom } from "./OverwriteConfirmState";
-import { overwriteConfirmActions } from "./OverwriteConfirmActions";
 
-const OverwriteConfirm: React.FC = () => {
+const OverwriteConfirm: React.FC<{
+  onConfirm: () => void;
+  onCancel: () => void;
+}> = ({ onConfirm, onCancel }) => {
   const { t } = useI18n();
   const [state, setState] = useAtom(overwriteConfirmStateAtom);
+  const setOverwriteConfirmState = useSetAtom(overwriteConfirmStateAtom);
 
   const handleConfirm = () => {
-    overwriteConfirmActions.confirm();
-    setState({ ...state, isOpen: false });
+    onConfirm();
+    setOverwriteConfirmState({ inputValue: "", aiToolData: null });
   };
 
   const handleCancel = () => {
-    overwriteConfirmActions.cancel();
-    setState({ ...state, isOpen: false });
+    onCancel();
+    setOverwriteConfirmState({ inputValue: "", aiToolData: null });
   };
 
   return (
     <Dialog
-      isOpen={state.isOpen}
       onCloseRequest={handleCancel}
-      title={t("overwriteConfirm.title")}
+      title="Overwrite"
     >
       <div className="OverwriteConfirm">
         <div className="OverwriteConfirm__description">
-          {t("overwriteConfirm.description")}
+          This will overwrite your current scene.
         </div>
         <TextField
-          label={t("overwriteConfirm.inputLabel")}
+          label="Type 'overwrite' to confirm"
           value={state.inputValue}
-          onChange={(e) =>
-            setState({ ...state, inputValue: e.target.value })
+          onChange={(value) =>
+            setState({ ...state, inputValue: value })
           }
         />
         <div className="OverwriteConfirm__actions">
@@ -43,12 +45,12 @@ const OverwriteConfirm: React.FC = () => {
             size="large"
             variant="outlined"
             color="danger"
-            label={t("overwriteConfirm.cancelButton")}
+            label="Cancel"
             onClick={handleCancel}
           />
           <FilledButton
             size="large"
-            label={t("overwriteConfirm.confirmButton")}
+            label="Overwrite"
             onClick={handleConfirm}
           />
         </div>

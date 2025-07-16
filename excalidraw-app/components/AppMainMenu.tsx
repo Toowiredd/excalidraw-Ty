@@ -89,17 +89,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.Separator />
       <MainMenu.Item
         icon={eyeIcon}
-        onClick={() => {
-          // Assume toggleAIToolsVisibility() handles showing/hiding the AI panel
-          // This function would likely be passed via props or use a global state manager.
-          if (typeof window.toggleAIToolsVisibility === 'function') {
-            window.toggleAIToolsVisibility();
-          } else {
-            console.warn("toggleAIToolsVisibility function not found. UI for AI tools won't be toggled.");
-            // As a fallback, directly log that the AI tools should be shown/hidden
-            alert("AI Tools menu item clicked. Implement visibility toggle for AI panel.");
-          }
-        }}
+        onClick={() => {}}
       >
         AI Tools
       </MainMenu.Item>

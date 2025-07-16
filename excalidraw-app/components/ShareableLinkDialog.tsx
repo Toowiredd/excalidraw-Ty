@@ -29,17 +29,17 @@ const ShareableLinkDialog = ({
   };
 
   return (
-    <Dialog size="small" onCloseRequest={onCloseRequest} title={t("labels.shareableLink")}>
+    <Dialog size="small" onCloseRequest={onCloseRequest} title="Shareable Link">
       <div className="ShareableLinkDialog">
         <TextField
-          label={t("labels.link")}
+          label="Link"
           value={link}
-          readOnly
+          readonly
           fullWidth
         />
         <FilledButton
           size="large"
-          label={t("buttons.copyLink")}
+          label="Copy"
           icon={copyIcon}
           status={copyStatus}
           onClick={copyLink}

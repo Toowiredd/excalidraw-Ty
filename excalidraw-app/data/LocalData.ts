@@ -96,8 +96,8 @@ const saveDataStateToLocalStorage = (
 
 type SavingLockTypes = "collaboration";
 
-export class LocalData {
-  private static _save = debounce(
+class _LocalData {
+  private _save = debounce(
     async (
       elements: readonly ExcalidrawElement[],
       appState: AppState,
@@ -116,7 +116,7 @@ export class LocalData {
   );
 
   /** Saves DataState, including files. Bails if saving is paused */
-  static save = (
+  save = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
@@ -128,27 +128,27 @@ export class LocalData {
     }
   };
 
-  static flushSave = () => {
+  flushSave = () => {
     this._save.flush();
   };
 
-  private static locker = new Locker<SavingLockTypes>();
+  private locker = new Locker<SavingLockTypes>();
 
-  static pauseSave = (lockType: SavingLockTypes) => {
+  pauseSave = (lockType: SavingLockTypes) => {
     this.locker.lock(lockType);
   };
 
-  static resumeSave = (lockType: SavingLockTypes) => {
+  resumeSave = (lockType: SavingLockTypes) => {
     this.locker.unlock(lockType);
   };
 
-  static isSavePaused = () => {
+  isSavePaused = () => {
     return document.hidden || this.locker.isLocked();
   };
 
   // ---------------------------------------------------------------------------
 
-  static fileStorage = new LocalFileManager({
+  fileStorage = new LocalFileManager({
     getFiles(ids) {
       return getMany(ids, filesStore).then(
         async (filesData: (BinaryFileData | undefined)[]) => {
@@ -207,6 +207,8 @@ export class LocalData {
     },
   });
 }
+
+export const LocalData = new _LocalData();
 export class LibraryIndexedDBAdapter {
   /** IndexedDB database and store name */
   private static idb_name = STORAGE_KEYS.IDB_LIBRARY;

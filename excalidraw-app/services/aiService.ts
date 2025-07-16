@@ -12,7 +12,7 @@ class AIService {
       }
     } catch (error) {
       console.error(`Failed to load model ${modelName} from ${modelUrl}:`, error);
-      throw new Error(`Failed to load model: ${error.message}`);
+      throw new Error(`Failed to load model: ${(error as Error).message}`);
     }
   }
 
@@ -27,7 +27,7 @@ class AIService {
       return predictions.map(prediction => prediction.arraySync());
     } catch (error) {
       console.error(`Prediction failed for model ${modelName}:`, error);
-      throw new Error(`Prediction failed: ${error.message}`);
+      throw new Error(`Prediction failed: ${(error as Error).message}`);
     }
   }
 
@@ -54,7 +54,7 @@ class AIService {
       return await response.json();
     } catch (error) {
       console.error("NLP task failed:", error);
-      throw new Error(error.message || "NLP task failed");
+      throw new Error((error as Error).message || "NLP task failed");
     }
   }
 
@@ -91,7 +91,7 @@ class AIService {
       return await response.json();
     } catch (error) {
       console.error("Image recognition failed:", error);
-      throw new Error(error.message || "Image recognition failed");
+      throw new Error((error as Error).message || "Image recognition failed");
     }
   }
 }

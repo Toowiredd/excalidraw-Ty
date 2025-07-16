@@ -15,12 +15,15 @@ import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
 import { isSyncableElement } from "../data";
 
 import type {
-  SocketUpdateData,
   SocketUpdateDataSource,
-  SyncableExcalidrawElement,
-} from "../data";
+} from "../data/types";
+import type { SyncableExcalidrawElement } from "../data/sync";
 import type { TCollabClass } from "./Collab";
 import type { Socket } from "socket.io-client";
+
+type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+  _brand: "socketUpdateData";
+};
 
 class Portal {
   collab: TCollabClass;
