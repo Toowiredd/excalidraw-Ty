@@ -398,10 +398,14 @@ const ExcalidrawWrapper = () => {
     }
   }, [excalidrawAPI]);
 
+import { aiApi } from "./ai-api";
+
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
     }
+    aiApi.initialize(excalidrawAPI, collabAPI!);
+    (window as any).aiApi = aiApi;
 
     const loadImages = (
       data: ResolutionType<typeof initializeScene>,
