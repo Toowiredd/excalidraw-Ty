@@ -1,12 +1,8 @@
-# DISABLED AUTO-RUN: Originally triggered on auto-triggers
-# Converted to manual execution only - 2025-10-18
-# Backup available at: size-limit.yml.backup
 name: "Bundle Size check @excalidraw/excalidraw"
 on:
-  workflow_dispatch:  # Manual trigger only
-#   pull_request:
-#     branches:
-#       - master
+  pull_request:
+    branches:
+      - master
 jobs:
   size:
     runs-on: ubuntu-latest

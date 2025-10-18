@@ -1,12 +1,8 @@
-# DISABLED AUTO-RUN: Originally triggered on auto-triggers
-# Converted to manual execution only - 2025-10-18
-# Backup available at: test.yml.backup
 name: Tests
 
 on:
-  workflow_dispatch:  # Manual trigger only
-#   push:
-#     branches: master
+  push:
+    branches: master
 
 jobs:
   test:

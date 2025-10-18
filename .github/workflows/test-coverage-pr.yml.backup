@@ -1,10 +1,6 @@
-# DISABLED AUTO-RUN: Originally triggered on auto-triggers
-# Converted to manual execution only - 2025-10-18
-# Backup available at: test-coverage-pr.yml.backup
 name: Test Coverage PR
 on:
-  workflow_dispatch:  # Manual trigger only
-#   pull_request:
+  pull_request:
 
 jobs:
   coverage:

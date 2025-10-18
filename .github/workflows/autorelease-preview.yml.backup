@@ -1,11 +1,7 @@
-# DISABLED AUTO-RUN: Originally triggered on auto-triggers
-# Converted to manual execution only - 2025-10-18
-# Backup available at: autorelease-preview.yml.backup
 name: Auto release excalidraw preview
 on:
-  workflow_dispatch:  # Manual trigger only
-#   issue_comment:
-#     types: [created, edited]
+  issue_comment:
+    types: [created, edited]
 
 jobs:
   Auto-release-excalidraw-preview:

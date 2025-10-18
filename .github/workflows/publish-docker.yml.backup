@@ -1,13 +1,9 @@
-# DISABLED AUTO-RUN: Originally triggered on auto-triggers
-# Converted to manual execution only - 2025-10-18
-# Backup available at: publish-docker.yml.backup
 name: Publish Docker
 
 on:
-  workflow_dispatch:  # Manual trigger only
-#   push:
-#     branches:
-#       - release
+  push:
+    branches:
+      - release
 
 jobs:
   publish-docker:
