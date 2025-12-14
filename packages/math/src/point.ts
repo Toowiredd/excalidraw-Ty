@@ -92,8 +92,9 @@ export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
   a: Point,
   b: Point,
 ): boolean {
-  const abs = Math.abs;
-  return abs(a[0] - b[0]) < PRECISION && abs(a[1] - b[1]) < PRECISION;
+  return (
+    Math.abs(a[0] - b[0]) < PRECISION && Math.abs(a[1] - b[1]) < PRECISION
+  );
 }
 
 /**
@@ -105,13 +106,19 @@ export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
  * @returns The rotated point
  */
 export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
-  [x, y]: Point,
-  [cx, cy]: Point,
+  point: Point,
+  center: Point,
   angle: Radians,
 ): Point {
+  const [x, y] = point;
+  const [cx, cy] = center;
+
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
   return pointFrom(
-    (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
-    (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
+    (x - cx) * cos - (y - cy) * sin + cx,
+    (x - cx) * sin + (y - cy) * cos + cy,
   );
 }
 
@@ -203,11 +210,13 @@ export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
  * @param multiplier The scaling factor
  * @returns
  */
-export const pointScaleFromOrigin = <P extends GlobalPoint | LocalPoint>(
+export function pointScaleFromOrigin<P extends GlobalPoint | LocalPoint>(
   p: P,
   mid: P,
   multiplier: number,
-) => pointTranslate(mid, vectorScale(vectorFromPoint(p, mid), multiplier));
+) {
+  return pointTranslate(mid, vectorScale(vectorFromPoint(p, mid), multiplier));
+}
 
 /**
  * Returns whether `q` lies inside the segment/rectangle defined by `p` and `r`.
@@ -218,15 +227,15 @@ export const pointScaleFromOrigin = <P extends GlobalPoint | LocalPoint>(
  * @param r The other point to compare against
  * @returns TRUE if q is indeed between p and r
  */
-export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
+export function isPointWithinBounds<P extends GlobalPoint | LocalPoint>(
   p: P,
   q: P,
   r: P,
-) => {
+) {
   return (
     q[0] <= Math.max(p[0], r[0]) &&
     q[0] >= Math.min(p[0], r[0]) &&
     q[1] <= Math.max(p[1], r[1]) &&
     q[1] >= Math.min(p[1], r[1])
   );
-};
+}

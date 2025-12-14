@@ -31,10 +31,10 @@ export function rangeInclusiveFromPair(pair: [start: number, end: number]) {
  * @param param1 The other range to compare against
  * @returns TRUE if the ranges overlap
  */
-export const rangesOverlap = (
+export function rangesOverlap(
   [a0, a1]: InclusiveRange,
   [b0, b1]: InclusiveRange,
-): boolean => {
+): boolean {
   if (a0 <= b0) {
     return a1 >= b0;
   }
@@ -44,7 +44,7 @@ export const rangesOverlap = (
   }
 
   return false;
-};
+}
 
 /**
  * Given two ranges,return ther intersection of the two ranges if any e.g. the
@@ -54,10 +54,10 @@ export const rangesOverlap = (
  * @param param1 The second range to compare
  * @returns The inclusive range intersection or NULL if no intersection
  */
-export const rangeIntersection = (
+export function rangeIntersection(
   [a0, a1]: InclusiveRange,
   [b0, b1]: InclusiveRange,
-): InclusiveRange | null => {
+): InclusiveRange | null {
   const rangeStart = Math.max(a0, b0);
   const rangeEnd = Math.min(a1, b1);
 
@@ -66,7 +66,7 @@ export const rangeIntersection = (
   }
 
   return null;
-};
+}
 
 /**
  * Determine if a value is inside a range.
@@ -75,9 +75,9 @@ export const rangeIntersection = (
  * @param range The range
  * @returns
  */
-export const rangeIncludesValue = (
+export function rangeIncludesValue(
   value: number,
   [min, max]: InclusiveRange,
-): boolean => {
+): boolean {
   return value >= min && value <= max;
-};
+}

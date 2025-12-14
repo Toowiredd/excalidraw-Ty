@@ -7,13 +7,8 @@ import type { GlobalPoint, LocalPoint, Vector } from "./types";
  * @param y T Y aspect of the vector
  * @returns The constructed vector with X and Y as the coordinates
  */
-export function vector(
-  x: number,
-  y: number,
-  originX: number = 0,
-  originY: number = 0,
-): Vector {
-  return [x - originX, y - originY] as Vector;
+export function vector(x: number, y: number): Vector {
+  return [x, y] as Vector;
 }
 
 /**
@@ -50,7 +45,7 @@ export function vectorCross(a: Vector, b: Vector): number {
  * @param b The other vector for which the sum of products is calculated
  * @returns The sum of products of the two vectors
  */
-export function vectorDot(a: Vector, b: Vector) {
+export function vectorDot(a: Vector, b: Vector): number {
   return a[0] * b[0] + a[1] * b[1];
 }
 
@@ -114,7 +109,7 @@ export function vectorScale(v: Vector, scalar: number): Vector {
  * @param v The vector to measure
  * @returns The scalar squared magnitude of the vector
  */
-export function vectorMagnitudeSq(v: Vector) {
+export function vectorMagnitudeSq(v: Vector): number {
   return v[0] * v[0] + v[1] * v[1];
 }
 
@@ -124,7 +119,7 @@ export function vectorMagnitudeSq(v: Vector) {
  * @param v The vector to measure
  * @returns The scalar magnitude of the vector
  */
-export function vectorMagnitude(v: Vector) {
+export function vectorMagnitude(v: Vector): number {
   return Math.sqrt(vectorMagnitudeSq(v));
 }
 
@@ -134,7 +129,7 @@ export function vectorMagnitude(v: Vector) {
  * @param v The vector to normalize
  * @returns The new normalized vector
  */
-export const vectorNormalize = (v: Vector): Vector => {
+export function vectorNormalize(v: Vector): Vector {
   const m = vectorMagnitude(v);
 
   if (m === 0) {
@@ -142,9 +137,11 @@ export const vectorNormalize = (v: Vector): Vector => {
   }
 
   return vector(v[0] / m, v[1] / m);
-};
+}
 
 /**
  * Calculate the right-hand normal of the vector.
  */
-export const vectorNormal = (v: Vector): Vector => vector(v[1], -v[0]);
+export function vectorNormal(v: Vector): Vector {
+  return vector(v[1], -v[0]);
+}

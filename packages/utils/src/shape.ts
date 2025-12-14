@@ -121,23 +121,23 @@ export function getPolygonShape<Point extends GlobalPoint | LocalPoint>(
   const cx = x + width / 2;
   const cy = y + height / 2;
 
-  const center: Point = pointFrom(cx, cy);
+  const center: Point = pointFrom<Point>(cx, cy);
 
   let data: Polygon<Point>;
 
   if (element.type === "diamond") {
     data = polygon(
-      pointRotateRads(pointFrom(cx, y), center, angle),
-      pointRotateRads(pointFrom(x + width, cy), center, angle),
-      pointRotateRads(pointFrom(cx, y + height), center, angle),
-      pointRotateRads(pointFrom(x, cy), center, angle),
+      pointRotateRads(pointFrom<Point>(cx, y), center, angle),
+      pointRotateRads(pointFrom<Point>(x + width, cy), center, angle),
+      pointRotateRads(pointFrom<Point>(cx, y + height), center, angle),
+      pointRotateRads(pointFrom<Point>(x, cy), center, angle),
     );
   } else {
     data = polygon(
-      pointRotateRads(pointFrom(x, y), center, angle),
-      pointRotateRads(pointFrom(x + width, y), center, angle),
-      pointRotateRads(pointFrom(x + width, y + height), center, angle),
-      pointRotateRads(pointFrom(x, y + height), center, angle),
+      pointRotateRads(pointFrom<Point>(x, y), center, angle),
+      pointRotateRads(pointFrom<Point>(x + width, y), center, angle),
+      pointRotateRads(pointFrom<Point>(x + width, y + height), center, angle),
+      pointRotateRads(pointFrom<Point>(x, y + height), center, angle),
     );
   }
 
@@ -164,24 +164,24 @@ export function getSelectionBoxShape<Point extends GlobalPoint | LocalPoint>(
   const paddedY1 = y1 - padding;
   const paddedY2 = y2 + padding;
 
-  const center = pointFrom(cx, cy);
+  const center = pointFrom<Point>(cx, cy);
   const topLeft = pointRotateRads(
-    pointFrom(paddedX1, paddedY1),
+    pointFrom<Point>(paddedX1, paddedY1),
     center,
     element.angle,
   );
   const topRight = pointRotateRads(
-    pointFrom(paddedX2, paddedY1),
+    pointFrom<Point>(paddedX2, paddedY1),
     center,
     element.angle,
   );
   const bottomLeft = pointRotateRads(
-    pointFrom(paddedX1, paddedY2),
+    pointFrom<Point>(paddedX1, paddedY2),
     center,
     element.angle,
   );
   const bottomRight = pointRotateRads(
-    pointFrom(paddedX2, paddedY2),
+    pointFrom<Point>(paddedX2, paddedY2),
     center,
     element.angle,
   );
@@ -201,7 +201,7 @@ export function getEllipseShape<Point extends GlobalPoint | LocalPoint>(
   return {
     type: "ellipse",
     data: {
-      center: pointFrom(x + width / 2, y + height / 2),
+      center: pointFrom<Point>(x + width / 2, y + height / 2),
       angle,
       halfWidth: width / 2,
       halfHeight: height / 2,
@@ -226,13 +226,13 @@ export function getCurvePathOps(shape: Drawable): Op[] {
 // linear
 export function getCurveShape<Point extends GlobalPoint | LocalPoint>(
   roughShape: Drawable,
-  startingPoint: Point = pointFrom(0, 0),
+  startingPoint: Point = pointFrom<Point>(0, 0),
   angleInRadian: Radians,
   center: Point,
 ): GeometricShape<Point> {
   const transform = (p: Point): Point =>
     pointRotateRads(
-      pointFrom(p[0] + startingPoint[0], p[1] + startingPoint[1]),
+      pointFrom<Point>(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
       angleInRadian,
     );
@@ -317,7 +317,7 @@ export function getClosedCurveShape<Point extends GlobalPoint | LocalPoint>(
 ): GeometricShape<Point> {
   const transform = (p: Point) =>
     pointRotateRads(
-      pointFrom(p[0] + startingPoint[0], p[1] + startingPoint[1]),
+      pointFrom<Point>(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
       angleInRadian,
     );
@@ -339,17 +339,17 @@ export function getClosedCurveShape<Point extends GlobalPoint | LocalPoint>(
     if (operation.op === "move") {
       odd = !odd;
       if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
+        points.push(pointFrom<Point>(operation.data[0], operation.data[1]));
       }
     } else if (operation.op === "bcurveTo") {
       if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
-        points.push(pointFrom(operation.data[2], operation.data[3]));
-        points.push(pointFrom(operation.data[4], operation.data[5]));
+        points.push(pointFrom<Point>(operation.data[0], operation.data[1]));
+        points.push(pointFrom<Point>(operation.data[2], operation.data[3]));
+        points.push(pointFrom<Point>(operation.data[4], operation.data[5]));
       }
     } else if (operation.op === "lineTo") {
       if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
+        points.push(pointFrom<Point>(operation.data[0], operation.data[1]));
       }
     }
   }
@@ -387,28 +387,28 @@ export function segmentIntersectRectangleElement<
     element.x + element.width + gap,
     element.y + element.height + gap,
   ];
-  const center = pointFrom(
+  const center = pointFrom<Point>(
     (bounds[0] + bounds[2]) / 2,
     (bounds[1] + bounds[3]) / 2,
   );
 
   const topLeft = pointRotateRads(
-    pointFrom(bounds[0], bounds[1]),
+    pointFrom<Point>(bounds[0], bounds[1]),
     center,
     element.angle,
   );
   const topRight = pointRotateRads(
-    pointFrom(bounds[2], bounds[1]),
+    pointFrom<Point>(bounds[2], bounds[1]),
     center,
     element.angle,
   );
   const bottomRight = pointRotateRads(
-    pointFrom(bounds[2], bounds[3]),
+    pointFrom<Point>(bounds[2], bounds[3]),
     center,
     element.angle,
   );
   const bottomLeft = pointRotateRads(
-    pointFrom(bounds[0], bounds[3]),
+    pointFrom<Point>(bounds[0], bounds[3]),
     center,
     element.angle,
   );
@@ -438,7 +438,7 @@ function distanceToEllipse<Point extends LocalPoint | GlobalPoint>(
   );
   const [rotatedPointX, rotatedPointY] = pointRotateRads(
     pointFromVector(translatedPoint),
-    pointFrom(0, 0),
+    pointFrom<Point>(0, 0),
     -angle as Radians,
   );
 
@@ -477,8 +477,8 @@ function distanceToEllipse<Point extends LocalPoint | GlobalPoint>(
   ];
 
   return pointDistance(
-    pointFrom(rotatedPointX, rotatedPointY),
-    pointFrom(minX, minY),
+    pointFrom<Point>(rotatedPointX, rotatedPointY),
+    pointFrom<Point>(minX, minY),
   );
 }
 
@@ -501,7 +501,7 @@ export function pointInEllipse<Point extends LocalPoint | GlobalPoint>(
   );
   const [rotatedPointX, rotatedPointY] = pointRotateRads(
     pointFromVector(translatedPoint),
-    pointFrom(0, 0),
+    pointFrom<Point>(0, 0),
     -angle as Radians,
   );
 

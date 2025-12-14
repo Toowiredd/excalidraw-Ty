@@ -15,8 +15,6 @@ export function triangleIncludesPoint<P extends GlobalPoint | LocalPoint>(
   [a, b, c]: Triangle<P>,
   p: P,
 ): boolean {
-  const triangleSign = (p1: P, p2: P, p3: P) =>
-    (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
   const d1 = triangleSign(p, a, b);
   const d2 = triangleSign(p, b, c);
   const d3 = triangleSign(p, c, a);
@@ -25,4 +23,12 @@ export function triangleIncludesPoint<P extends GlobalPoint | LocalPoint>(
   const has_pos = d1 > 0 || d2 > 0 || d3 > 0;
 
   return !(has_neg && has_pos);
+}
+
+function triangleSign<P extends GlobalPoint | LocalPoint>(
+  p1: P,
+  p2: P,
+  p3: P,
+): number {
+  return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
 }
