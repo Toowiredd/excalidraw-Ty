@@ -34,7 +34,7 @@ type ExportOpts = {
   ) => { width: number; height: number; scale?: number };
 };
 
-export const exportToCanvas = ({
+export function exportToCanvas({
   elements,
   appState,
   files,
@@ -44,7 +44,7 @@ export const exportToCanvas = ({
   exportingFrame,
 }: ExportOpts & {
   exportPadding?: number;
-}) => {
+}) {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
@@ -94,15 +94,15 @@ export const exportToCanvas = ({
       };
     },
   );
-};
+}
 
-export const exportToBlob = async (
+export async function exportToBlob(
   opts: ExportOpts & {
     mimeType?: string;
     quality?: number;
     exportPadding?: number;
   },
-): Promise<Blob> => {
+): Promise<Blob> {
   let { mimeType = MIME_TYPES.png, quality } = opts;
 
   if (mimeType === MIME_TYPES.png && typeof quality === "number") {
@@ -126,7 +126,7 @@ export const exportToBlob = async (
 
   const canvas = await exportToCanvas(opts);
 
-  quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
+  quality = quality || (/image\/jpe?g/.test(mimeType) ? 0.92 : 0.8);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -158,9 +158,9 @@ export const exportToBlob = async (
       quality,
     );
   });
-};
+}
 
-export const exportToSvg = async ({
+export async function exportToSvg({
   elements,
   appState = getDefaultAppState(),
   files = {},
@@ -174,7 +174,7 @@ export const exportToSvg = async ({
   renderEmbeddables?: boolean;
   skipInliningFonts?: true;
   reuseImages?: boolean;
-}): Promise<SVGSVGElement> => {
+}): Promise<SVGSVGElement> {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
@@ -192,23 +192,24 @@ export const exportToSvg = async ({
     skipInliningFonts,
     reuseImages,
   });
-};
+}
 
-export const exportToClipboard = async (
+export async function exportToClipboard(
   opts: ExportOpts & {
     mimeType?: string;
     quality?: number;
     type: "png" | "svg" | "json";
   },
-) => {
+) {
   if (opts.type === "svg") {
     const svg = await exportToSvg(opts);
     await copyTextToSystemClipboard(svg.outerHTML);
   } else if (opts.type === "png") {
-    await copyBlobToClipboardAsPng(exportToBlob(opts));
+    const blob = await exportToBlob(opts);
+    await copyBlobToClipboardAsPng(blob);
   } else if (opts.type === "json") {
     await copyToClipboard(opts.elements, opts.files);
   } else {
     throw new Error("Invalid export type");
   }
-};
+}

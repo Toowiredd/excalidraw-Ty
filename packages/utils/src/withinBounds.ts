@@ -8,10 +8,8 @@ import {
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 import {
-  rangeIncludesValue,
   pointFrom,
   pointRotateRads,
-  rangeInclusive,
 } from "@excalidraw/math";
 
 import type { Bounds } from "@excalidraw/element/bounds";
@@ -41,17 +39,19 @@ const getNonLinearElementRelativePoints = (
   BottomLeft: LocalPoint,
 ] => {
   if (element.type === "diamond") {
+    const halfWidth = element.width / 2;
+    const halfHeight = element.height / 2;
     return [
-      pointFrom(element.width / 2, 0),
-      pointFrom(element.width, element.height / 2),
-      pointFrom(element.width / 2, element.height),
-      pointFrom(0, element.height / 2),
+      pointFrom(halfWidth, 0),
+      pointFrom(element.width, halfHeight),
+      pointFrom(halfWidth, element.height),
+      pointFrom(0, halfHeight),
     ];
   }
   return [
     pointFrom(0, 0),
-    pointFrom(0 + element.width, 0),
-    pointFrom(0 + element.width, element.height),
+    pointFrom(element.width, 0),
+    pointFrom(element.width, element.height),
     pointFrom(0, element.height),
   ];
 };
@@ -110,11 +110,11 @@ const getRotatedBBox = (element: Element): Bounds => {
   ];
 };
 
-export const isElementInsideBBox = (
+export function isElementInsideBBox(
   element: Element,
   bbox: Bounds,
   eitherDirection = false,
-): boolean => {
+): boolean {
   const elementBBox = getRotatedBBox(element);
 
   const elementInsideBbox =
@@ -137,29 +137,25 @@ export const isElementInsideBBox = (
     elementBBox[1] <= bbox[1] &&
     elementBBox[3] >= bbox[3]
   );
-};
+}
 
-export const elementPartiallyOverlapsWithOrContainsBBox = (
+export function elementPartiallyOverlapsWithOrContainsBBox(
   element: Element,
   bbox: Bounds,
-): boolean => {
+): boolean {
   const elementBBox = getRotatedBBox(element);
 
+  // Check for AABB intersection:
+  // (minA <= maxB) && (maxA >= minB) for both X and Y axes
   return (
-    (rangeIncludesValue(elementBBox[0], rangeInclusive(bbox[0], bbox[2])) ||
-      rangeIncludesValue(
-        bbox[0],
-        rangeInclusive(elementBBox[0], elementBBox[2]),
-      )) &&
-    (rangeIncludesValue(elementBBox[1], rangeInclusive(bbox[1], bbox[3])) ||
-      rangeIncludesValue(
-        bbox[1],
-        rangeInclusive(elementBBox[1], elementBBox[3]),
-      ))
+    elementBBox[0] <= bbox[2] &&
+    elementBBox[2] >= bbox[0] &&
+    elementBBox[1] <= bbox[3] &&
+    elementBBox[3] >= bbox[1]
   );
-};
+}
 
-export const elementsOverlappingBBox = ({
+export function elementsOverlappingBBox({
   elements,
   bounds,
   type,
@@ -175,7 +171,7 @@ export const elementsOverlappingBBox = ({
    * - inside: elements inside bounds
    **/
   type: "overlap" | "contain" | "inside";
-}) => {
+}) {
   if (isExcalidrawElement(bounds)) {
     bounds = getElementBounds(bounds, arrayToMap(elements));
   }
@@ -193,14 +189,14 @@ export const elementsOverlappingBBox = ({
       continue;
     }
 
-    const isOverlaping =
+    const isOverlapping =
       type === "overlap"
         ? elementPartiallyOverlapsWithOrContainsBBox(element, adjustedBBox)
         : type === "inside"
         ? isElementInsideBBox(element, adjustedBBox)
         : isElementInsideBBox(element, adjustedBBox, true);
 
-    if (isOverlaping) {
+    if (isOverlapping) {
       includedElementSet.add(element.id);
 
       if (element.boundElements) {
@@ -226,4 +222,4 @@ export const elementsOverlappingBBox = ({
   }
 
   return elements.filter((element) => includedElementSet.has(element.id));
-};
+}
