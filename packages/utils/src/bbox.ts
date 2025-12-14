@@ -20,54 +20,58 @@ export function getBBox<P extends LocalPoint | GlobalPoint>(
   ];
 }
 
-export function doBBoxesIntersect(a: Bounds, b: Bounds) {
+export function doBBoxesIntersect(a: Bounds, b: Bounds): boolean {
   return a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
 }
 
 const EPSILON = 0.000001;
 
+/**
+ * Checks if a point is colinear with a line segment.
+ * Warning: This does not check if the point is *on* the segment, only if it lies on the infinite line defined by the segment.
+ */
 export function isPointOnLine<P extends GlobalPoint | LocalPoint>(
-  l: LineSegment<P>,
-  p: P,
-) {
-  const p1 = vectorFromPoint(l[1], l[0]);
-  const p2 = vectorFromPoint(p, l[0]);
+  line: LineSegment<P>,
+  point: P,
+): boolean {
+  const vecA = vectorFromPoint(line[1], line[0]);
+  const vecB = vectorFromPoint(point, line[0]);
 
-  const r = vectorCross(p1, p2);
+  const crossProduct = vectorCross(vecA, vecB);
 
-  return Math.abs(r) < EPSILON;
+  return Math.abs(crossProduct) < EPSILON;
 }
 
 export function isPointRightOfLine<P extends GlobalPoint | LocalPoint>(
-  l: LineSegment<P>,
-  p: P,
-) {
-  const p1 = vectorFromPoint(l[1], l[0]);
-  const p2 = vectorFromPoint(p, l[0]);
+  line: LineSegment<P>,
+  point: P,
+): boolean {
+  const vecA = vectorFromPoint(line[1], line[0]);
+  const vecB = vectorFromPoint(point, line[0]);
 
-  return vectorCross(p1, p2) < 0;
+  return vectorCross(vecA, vecB) < 0;
 }
 
 export function isLineSegmentTouchingOrCrossingLine<
   P extends GlobalPoint | LocalPoint,
->(a: LineSegment<P>, b: LineSegment<P>) {
+>(segmentA: LineSegment<P>, segmentB: LineSegment<P>): boolean {
   return (
-    isPointOnLine(a, b[0]) ||
-    isPointOnLine(a, b[1]) ||
-    (isPointRightOfLine(a, b[0])
-      ? !isPointRightOfLine(a, b[1])
-      : isPointRightOfLine(a, b[1]))
+    isPointOnLine(segmentA, segmentB[0]) ||
+    isPointOnLine(segmentA, segmentB[1]) ||
+    (isPointRightOfLine(segmentA, segmentB[0])
+      ? !isPointRightOfLine(segmentA, segmentB[1])
+      : isPointRightOfLine(segmentA, segmentB[1]))
   );
 }
 
 // https://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
 export function doLineSegmentsIntersect<P extends GlobalPoint | LocalPoint>(
-  a: LineSegment<P>,
-  b: LineSegment<P>,
-) {
+  segmentA: LineSegment<P>,
+  segmentB: LineSegment<P>,
+): boolean {
   return (
-    doBBoxesIntersect(getBBox(a), getBBox(b)) &&
-    isLineSegmentTouchingOrCrossingLine(a, b) &&
-    isLineSegmentTouchingOrCrossingLine(b, a)
+    doBBoxesIntersect(getBBox(segmentA), getBBox(segmentB)) &&
+    isLineSegmentTouchingOrCrossingLine(segmentA, segmentB) &&
+    isLineSegmentTouchingOrCrossingLine(segmentB, segmentA)
   );
 }

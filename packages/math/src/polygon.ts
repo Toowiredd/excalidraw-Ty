@@ -16,10 +16,10 @@ export function polygonFromPoints<Point extends GlobalPoint | LocalPoint>(
   return polygonClose(points) as Polygon<Point>;
 }
 
-export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
+export function polygonIncludesPoint<Point extends LocalPoint | GlobalPoint>(
   point: Point,
   polygon: Polygon<Point>,
-) => {
+): boolean {
   const x = point[0];
   const y = point[1];
   let inside = false;
@@ -39,12 +39,12 @@ export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
   }
 
   return inside;
-};
+}
 
-export const polygonIncludesPointNonZero = <Point extends [number, number]>(
+export function polygonIncludesPointNonZero<Point extends [number, number]>(
   point: Point,
   polygon: Point[],
-): boolean => {
+): boolean {
   const [x, y] = point;
   let windingNumber = 0;
 
@@ -67,16 +67,18 @@ export const polygonIncludesPointNonZero = <Point extends [number, number]>(
   }
 
   return windingNumber !== 0;
-};
+}
 
-export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
+export function pointOnPolygon<Point extends LocalPoint | GlobalPoint>(
   p: Point,
   poly: Polygon<Point>,
   threshold = PRECISION,
-) => {
+): boolean {
   let on = false;
 
+  // Since polygon is closed (last point == first point), we iterate up to length-1 segments
   for (let i = 0, l = poly.length - 1; i < l; i++) {
+    // Avoid allocating new lineSegment array if possible, but pointOnLineSegment expects LineSegment
     if (pointOnLineSegment(p, lineSegment(poly[i], poly[i + 1]), threshold)) {
       on = true;
       break;
@@ -84,7 +86,7 @@ export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
   }
 
   return on;
-};
+}
 
 function polygonClose<Point extends LocalPoint | GlobalPoint>(
   polygon: Point[],
@@ -97,5 +99,7 @@ function polygonClose<Point extends LocalPoint | GlobalPoint>(
 function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
   polygon: Point[],
 ) {
-  return pointsEqual(polygon[0], polygon[polygon.length - 1]);
+  return (
+    polygon.length > 0 && pointsEqual(polygon[0], polygon[polygon.length - 1])
+  );
 }

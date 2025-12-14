@@ -19,7 +19,7 @@ export function curve<Point extends GlobalPoint | LocalPoint>(
   b: Point,
   c: Point,
   d: Point,
-) {
+): Curve<Point> {
   return [a, b, c, d] as Curve<Point>;
 }
 
@@ -83,20 +83,27 @@ function solve(
   return [t0, s0];
 }
 
-export const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
+export function bezierEquation<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   t: number,
-) =>
-  pointFrom<Point>(
-    (1 - t) ** 3 * c[0][0] +
-      3 * (1 - t) ** 2 * t * c[1][0] +
-      3 * (1 - t) * t ** 2 * c[2][0] +
-      t ** 3 * c[3][0],
-    (1 - t) ** 3 * c[0][1] +
-      3 * (1 - t) ** 2 * t * c[1][1] +
-      3 * (1 - t) * t ** 2 * c[2][1] +
-      t ** 3 * c[3][1],
+): Point {
+  const oneMinusT = 1 - t;
+  const t2 = t * t;
+  const t3 = t2 * t;
+  const oneMinusT2 = oneMinusT * oneMinusT;
+  const oneMinusT3 = oneMinusT2 * oneMinusT;
+
+  return pointFrom<Point>(
+    oneMinusT3 * c[0][0] +
+      3 * oneMinusT2 * t * c[1][0] +
+      3 * oneMinusT * t2 * c[2][0] +
+      t3 * c[3][0],
+    oneMinusT3 * c[0][1] +
+      3 * oneMinusT2 * t * c[1][1] +
+      3 * oneMinusT * t2 * c[2][1] +
+      t3 * c[3][1],
   );
+}
 
 /**
  * Computes the intersection between a cubic spline and a line segment.
@@ -249,7 +256,7 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
 export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   p: Point,
-) {
+): number {
   const closest = curveClosestPoint(c, p);
 
   if (!closest) {
@@ -278,20 +285,20 @@ export function isCurve<P extends GlobalPoint | LocalPoint>(
 export function curveTangent<Point extends GlobalPoint | LocalPoint>(
   [p0, p1, p2, p3]: Curve<Point>,
   t: number,
-) {
+): import("./types").Vector {
+  const oneMinusT = 1 - t;
+  const oneMinusT2 = oneMinusT * oneMinusT;
+  const t2 = t * t;
+
   return vector(
-    -3 * (1 - t) * (1 - t) * p0[0] +
-      3 * (1 - t) * (1 - t) * p1[0] -
-      6 * t * (1 - t) * p1[0] -
-      3 * t * t * p2[0] +
-      6 * t * (1 - t) * p2[0] +
-      3 * t * t * p3[0],
-    -3 * (1 - t) * (1 - t) * p0[1] +
-      3 * (1 - t) * (1 - t) * p1[1] -
-      6 * t * (1 - t) * p1[1] -
-      3 * t * t * p2[1] +
-      6 * t * (1 - t) * p2[1] +
-      3 * t * t * p3[1],
+    -3 * oneMinusT2 * p0[0] +
+      3 * (oneMinusT2 - 2 * t * oneMinusT) * p1[0] +
+      3 * (2 * t * oneMinusT - t2) * p2[0] +
+      3 * t2 * p3[0],
+    -3 * oneMinusT2 * p0[1] +
+      3 * (oneMinusT2 - 2 * t * oneMinusT) * p1[1] +
+      3 * (2 * t * oneMinusT - t2) * p2[1] +
+      3 * t2 * p3[1],
   );
 }
 

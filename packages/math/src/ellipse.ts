@@ -25,7 +25,6 @@ import type {
  * Construct an Ellipse object from the parameters
  *
  * @param center The center of the ellipse
- * @param angle The slanting of the ellipse in radians
  * @param halfWidth Half of the width of a non-slanted version of the ellipse
  * @param halfHeight Half of the height of a non-slanted version of the ellipse
  * @returns The constructed Ellipse object
@@ -49,16 +48,16 @@ export function ellipse<Point extends GlobalPoint | LocalPoint>(
  * @param ellipse The ellipse to compare against
  * @returns TRUE if the point is inside or on the outline of the ellipse
  */
-export const ellipseIncludesPoint = <Point extends GlobalPoint | LocalPoint>(
+export function ellipseIncludesPoint<Point extends GlobalPoint | LocalPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
-) => {
+): boolean {
   const { center, halfWidth, halfHeight } = ellipse;
   const normalizedX = (p[0] - center[0]) / halfWidth;
   const normalizedY = (p[1] - center[1]) / halfHeight;
 
   return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
-};
+}
 
 /**
  * Tests whether a point lies on the outline of the ellipse within a given
@@ -69,13 +68,13 @@ export const ellipseIncludesPoint = <Point extends GlobalPoint | LocalPoint>(
  * @param threshold The distance to consider a point close enough to be "on" the outline
  * @returns TRUE if the point is on the ellise outline
  */
-export const ellipseTouchesPoint = <Point extends GlobalPoint | LocalPoint>(
+export function ellipseTouchesPoint<Point extends GlobalPoint | LocalPoint>(
   point: Point,
   ellipse: Ellipse<Point>,
   threshold = PRECISION,
-) => {
+): boolean {
   return ellipseDistanceFromPoint(point, ellipse) <= threshold;
-};
+}
 
 /**
  * Determine the shortest euclidean distance from a point to the
@@ -85,22 +84,19 @@ export const ellipseTouchesPoint = <Point extends GlobalPoint | LocalPoint>(
  * @param ellipse The ellipse to calculate the distance to
  * @returns The eucledian distance
  */
-export const ellipseDistanceFromPoint = <
+export function ellipseDistanceFromPoint<
   Point extends GlobalPoint | LocalPoint,
 >(
   p: Point,
   ellipse: Ellipse<Point>,
-): number => {
+): number {
   const { halfWidth, halfHeight, center } = ellipse;
   const a = halfWidth;
   const b = halfHeight;
-  const translatedPoint = vectorAdd(
-    vectorFromPoint(p),
-    vectorScale(vectorFromPoint(center), -1),
-  );
 
-  const px = Math.abs(translatedPoint[0]);
-  const py = Math.abs(translatedPoint[1]);
+  // Translate point to ellipse center
+  const px = Math.abs(p[0] - center[0]);
+  const py = Math.abs(p[1] - center[1]);
 
   let tx = 0.707;
   let ty = 0.707;
@@ -128,13 +124,11 @@ export const ellipseDistanceFromPoint = <
     ty /= t;
   }
 
-  const [minX, minY] = [
-    a * tx * Math.sign(translatedPoint[0]),
-    b * ty * Math.sign(translatedPoint[1]),
-  ];
+  const minX = a * tx * Math.sign(p[0] - center[0]) + center[0];
+  const minY = b * ty * Math.sign(p[1] - center[1]) + center[1];
 
-  return pointDistance(pointFromVector(translatedPoint), pointFrom(minX, minY));
-};
+  return pointDistance(p, pointFrom<Point>(minX, minY));
+}
 
 /**
  * Calculate a maximum of two intercept points for a line going throug an
@@ -146,6 +140,7 @@ export function ellipseSegmentInterceptPoints<
   const rx = e.halfWidth;
   const ry = e.halfHeight;
 
+  // Transform segment to unit circle space relative to ellipse center
   const dir = vectorFromPoint(s[1], s[0]);
   const diff = vector(s[0][0] - e.center[0], s[0][1] - e.center[1]);
   const mDir = vector(dir[0] / (rx * rx), dir[1] / (ry * ry));
@@ -159,8 +154,9 @@ export function ellipseSegmentInterceptPoints<
   const intersections: Point[] = [];
 
   if (d > 0) {
-    const t_a = (-b - Math.sqrt(d)) / a;
-    const t_b = (-b + Math.sqrt(d)) / a;
+    const sqrtD = Math.sqrt(d);
+    const t_a = (-b - sqrtD) / a;
+    const t_b = (-b + sqrtD) / a;
 
     if (0 <= t_a && t_a <= 1) {
       intersections.push(
@@ -179,7 +175,7 @@ export function ellipseSegmentInterceptPoints<
         ),
       );
     }
-  } else if (d === 0) {
+  } else if (Math.abs(d) < PRECISION) {
     const t = -b / a;
     if (0 <= t && t <= 1) {
       intersections.push(
@@ -205,22 +201,30 @@ export function ellipseLineIntersectionPoints<
   const y1 = g[1] - cy;
   const x2 = h[0] - cx;
   const y2 = h[1] - cy;
-  const a =
-    Math.pow(x2 - x1, 2) / Math.pow(halfWidth, 2) +
-    Math.pow(y2 - y1, 2) / Math.pow(halfHeight, 2);
-  const b =
-    2 *
-    ((x1 * (x2 - x1)) / Math.pow(halfWidth, 2) +
-      (y1 * (y2 - y1)) / Math.pow(halfHeight, 2));
-  const c =
-    Math.pow(x1, 2) / Math.pow(halfWidth, 2) +
-    Math.pow(y1, 2) / Math.pow(halfHeight, 2) -
-    1;
-  const t1 = (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
-  const t2 = (-b - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+
+  const hw2 = halfWidth * halfWidth;
+  const hh2 = halfHeight * halfHeight;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  const a = (dx * dx) / hw2 + (dy * dy) / hh2;
+  const b = 2 * ((x1 * dx) / hw2 + (y1 * dy) / hh2);
+  const c = (x1 * x1) / hw2 + (y1 * y1) / hh2 - 1;
+
+  const delta = b * b - 4 * a * c;
+
+  if (delta < 0) {
+    return [];
+  }
+
+  const sqrtDelta = Math.sqrt(delta);
+  const t1 = (-b + sqrtDelta) / (2 * a);
+  const t2 = (-b - sqrtDelta) / (2 * a);
+
   const candidates = [
-    pointFrom<Point>(x1 + t1 * (x2 - x1) + cx, y1 + t1 * (y2 - y1) + cy),
-    pointFrom<Point>(x1 + t2 * (x2 - x1) + cx, y1 + t2 * (y2 - y1) + cy),
+    pointFrom<Point>(x1 + t1 * dx + cx, y1 + t1 * dy + cy),
+    pointFrom<Point>(x1 + t2 * dx + cx, y1 + t2 * dy + cy),
   ].filter((p) => !isNaN(p[0]) && !isNaN(p[1]));
 
   if (candidates.length === 2 && pointsEqual(candidates[0], candidates[1])) {
