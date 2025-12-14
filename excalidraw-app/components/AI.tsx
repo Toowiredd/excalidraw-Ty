@@ -9,6 +9,7 @@ import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
 import AIService from "../services/aiService";
 import React, { useState } from "react";
+import ImageRecognitionResult from "./ImageRecognitionResult";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
@@ -226,7 +227,7 @@ export const AIComponents = ({
             }}
           />
           {imageRecError && <div style={{ color: 'red' }}>Error: {imageRecError}</div>}
-          {imageRecResult && <div>Result: {JSON.stringify(imageRecResult)}</div>}
+          <ImageRecognitionResult result={imageRecResult} />
         </div>
       </div>
     </>
