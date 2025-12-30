@@ -47,12 +47,13 @@ export class BinaryHeap<T> {
 
       if (swap !== null) {
         this.content[idx] = this.content[swap];
-        this.content[swap] = node;
-        idx = swap; // TODO: Optimize
+        idx = swap;
       } else {
         break;
       }
     }
+
+    this.content[idx] = node;
   }
 
   push(node: T) {
