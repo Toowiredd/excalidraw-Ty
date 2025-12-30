@@ -71,6 +71,8 @@ export const getGridPoint = (
 ): [number, number] => {
   if (gridSize) {
     return [
+      // Pre-rounding to integer reduces floating point jitter (shake)
+      // when near the grid threshold
       Math.round(Math.round(x) / gridSize) * gridSize,
       Math.round(Math.round(y) / gridSize) * gridSize,
     ];
