@@ -553,29 +553,54 @@ const solveQuadratic = (
   return [s1, s2];
 };
 
+/**
+ * Calculates the bounding box for a quadratic Bezier curve.
+ *
+ * @param p0 Start point
+ * @param p1 Control point
+ * @param p2 End point
+ */
 const getQuadraticBezierCurveBound = (
   p0: GlobalPoint,
   p1: GlobalPoint,
   p2: GlobalPoint,
 ): Bounds => {
-  const check = (v0: number, v1: number, v2: number): number[] => {
-    const t = (v0 - v1) / (v0 - 2 * v1 + v2);
+  const calculateExtremum = (
+    v0: number,
+    v1: number,
+    v2: number,
+  ): number | null => {
+    const denom = v0 - 2 * v1 + v2;
+    if (denom === 0) {
+      return null;
+    }
+
+    const t = (v0 - v1) / denom;
     if (t > 0 && t < 1) {
       const oneMinusT = 1 - t;
-      const val =
-        oneMinusT * oneMinusT * v0 + 2 * oneMinusT * t * v1 + t * t * v2;
-      return [val];
+      return oneMinusT * oneMinusT * v0 + 2 * oneMinusT * t * v1 + t * t * v2;
     }
-    return [];
+    return null;
   };
 
-  const xExtrema = check(p0[0], p1[0], p2[0]);
-  const yExtrema = check(p0[1], p1[1], p2[1]);
+  const xExtremum = calculateExtremum(p0[0], p1[0], p2[0]);
+  const yExtremum = calculateExtremum(p0[1], p1[1], p2[1]);
 
-  const minX = Math.min(p0[0], p2[0], ...xExtrema);
-  const maxX = Math.max(p0[0], p2[0], ...xExtrema);
-  const minY = Math.min(p0[1], p2[1], ...yExtrema);
-  const maxY = Math.max(p0[1], p2[1], ...yExtrema);
+  let minX = Math.min(p0[0], p2[0]);
+  let maxX = Math.max(p0[0], p2[0]);
+
+  if (xExtremum !== null) {
+    minX = Math.min(minX, xExtremum);
+    maxX = Math.max(maxX, xExtremum);
+  }
+
+  let minY = Math.min(p0[1], p2[1]);
+  let maxY = Math.max(p0[1], p2[1]);
+
+  if (yExtremum !== null) {
+    minY = Math.min(minY, yExtremum);
+    maxY = Math.max(maxY, yExtremum);
+  }
 
   return [minX, minY, maxX, maxY];
 };
