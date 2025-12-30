@@ -3393,7 +3393,10 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (opts.files) {
-      this.addNewImagesToImageCache();
+      // Use setState to ensure the callback runs after the previous setState in updateScene
+      this.setState({}, () => {
+        this.addNewImagesToImageCache();
+      });
     }
     this.setActiveTool({ type: "selection" });
 

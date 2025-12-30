@@ -153,7 +153,6 @@ export class Store implements IStore {
   /**
    * @deprecated Use `captureUpdate` in `updateScene` / `syncActionResult` instead.
    */
-  // TODO: Suspicious that this is called so many places. Seems error-prone.
   public shouldCaptureIncrement = () => {
     this.scheduleAction(CaptureUpdateAction.IMMEDIATELY);
   };
