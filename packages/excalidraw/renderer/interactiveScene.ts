@@ -884,13 +884,26 @@ const _renderInteractiveScene = ({
           // remote users
           if (remoteClients) {
             selectionColors.push(
-              ...remoteClients.map((socketId) => {
-                const background = getClientColor(
-                  socketId,
-                  appState.collaborators.get(socketId),
-                );
-                return background;
-              }),
+              ...remoteClients
+                .filter((socketId) => {
+                  if (renderConfig.remoteSelectedGroupIds) {
+                    for (const groupId of element.groupIds) {
+                      const socketIds =
+                        renderConfig.remoteSelectedGroupIds.get(groupId);
+                      if (socketIds?.includes(socketId)) {
+                        return false;
+                      }
+                    }
+                  }
+                  return true;
+                })
+                .map((socketId) => {
+                  const background = getClientColor(
+                    socketId,
+                    appState.collaborators.get(socketId),
+                  );
+                  return background;
+                }),
             );
           }
         }
@@ -923,7 +936,11 @@ const _renderInteractiveScene = ({
         }
       }
 
-      const addSelectionForGroupId = (groupId: GroupId) => {
+      const addSelectionForGroupId = (
+        groupId: GroupId,
+        selectionColors: string[],
+        dashed: boolean,
+      ) => {
         const groupElements = getElementsInGroup(elementsMap, groupId);
         const [x1, y1, x2, y2] = getCommonBounds(groupElements);
         selections.push({
@@ -932,8 +949,8 @@ const _renderInteractiveScene = ({
           x2,
           y1,
           y2,
-          selectionColors: [oc.black],
-          dashed: true,
+          selectionColors,
+          dashed,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
           activeEmbeddable: false,
@@ -942,11 +959,20 @@ const _renderInteractiveScene = ({
 
       for (const groupId of getSelectedGroupIds(appState)) {
         // TODO: support multiplayer selected group IDs
-        addSelectionForGroupId(groupId);
+        addSelectionForGroupId(groupId, [oc.black], true);
+      }
+
+      if (renderConfig.remoteSelectedGroupIds) {
+        for (const [groupId, socketIds] of renderConfig.remoteSelectedGroupIds) {
+          const selectionColors = socketIds.map((socketId) =>
+            getClientColor(socketId, appState.collaborators.get(socketId)),
+          );
+          addSelectionForGroupId(groupId, selectionColors, true);
+        }
       }
 
       if (appState.editingGroupId) {
-        addSelectionForGroupId(appState.editingGroupId);
+        addSelectionForGroupId(appState.editingGroupId, [oc.black], true);
       }
 
       selections.forEach((selection) =>

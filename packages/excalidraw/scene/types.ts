@@ -61,6 +61,7 @@ export type InteractiveCanvasRenderConfig = {
   // collab-related state
   // ---------------------------------------------------------------------------
   remoteSelectedElementIds: Map<ExcalidrawElement["id"], SocketId[]>;
+  remoteSelectedGroupIds: Map<ExcalidrawElement["id"], SocketId[]>;
   remotePointerViewportCoords: Map<SocketId, { x: number; y: number }>;
   remotePointerUserStates: Map<SocketId, UserIdleState>;
   remotePointerUsernames: Map<SocketId, string>;
