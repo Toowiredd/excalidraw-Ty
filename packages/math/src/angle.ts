@@ -8,15 +8,16 @@ import type {
   Radians,
 } from "./types";
 
-// TODO: Simplify with modulo and fix for angles beyond 4*Math.PI and - 4*Math.PI
+const TWO_PI = 2 * Math.PI;
+
+/**
+ * Normalizes an angle to be within the range [0, 2π).
+ * Uses modulo arithmetic to handle angles outside the standard range,
+ * including negative angles and angles larger than 4π.
+ */
 export const normalizeRadians = (angle: Radians): Radians => {
-  if (angle < 0) {
-    return (angle + 2 * Math.PI) as Radians;
-  }
-  if (angle >= 2 * Math.PI) {
-    return (angle - 2 * Math.PI) as Radians;
-  }
-  return angle;
+  // ((a % n) + n) % n ensures the result is always positive and within [0, n)
+  return (((angle % TWO_PI) + TWO_PI) % TWO_PI) as Radians;
 };
 
 /**
