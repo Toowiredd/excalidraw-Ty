@@ -553,6 +553,33 @@ const solveQuadratic = (
   return [s1, s2];
 };
 
+const getQuadraticBezierCurveBound = (
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+): Bounds => {
+  const check = (v0: number, v1: number, v2: number): number[] => {
+    const t = (v0 - v1) / (v0 - 2 * v1 + v2);
+    if (t > 0 && t < 1) {
+      const oneMinusT = 1 - t;
+      const val =
+        oneMinusT * oneMinusT * v0 + 2 * oneMinusT * t * v1 + t * t * v2;
+      return [val];
+    }
+    return [];
+  };
+
+  const xExtrema = check(p0[0], p1[0], p2[0]);
+  const yExtrema = check(p0[1], p1[1], p2[1]);
+
+  const minX = Math.min(p0[0], p2[0], ...xExtrema);
+  const maxX = Math.max(p0[0], p2[0], ...xExtrema);
+  const minY = Math.min(p0[1], p2[1], ...yExtrema);
+  const maxY = Math.max(p0[1], p2[1], ...yExtrema);
+
+  return [minX, minY, maxX, maxY];
+};
+
 const getCubicBezierCurveBound = (
   p0: GlobalPoint,
   p1: GlobalPoint,
@@ -623,9 +650,39 @@ export const getMinMaxXYFromCurvePathOps = (
         limits.maxX = Math.max(limits.maxX, maxX);
         limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
-        // TODO: Implement this
+        const _p1 = pointFrom<GlobalPoint>(data[0], data[1]);
+
+        const p1 = transformXY ? transformXY(_p1) : _p1;
+        const p0 = transformXY ? transformXY(currentP) : currentP;
+
+        currentP = _p1;
+
+        limits.minX = Math.min(limits.minX, p0[0], p1[0]);
+        limits.minY = Math.min(limits.minY, p0[1], p1[1]);
+
+        limits.maxX = Math.max(limits.maxX, p0[0], p1[0]);
+        limits.maxY = Math.max(limits.maxY, p0[1], p1[1]);
       } else if (op === "qcurveTo") {
-        // TODO: Implement this
+        const _p1 = pointFrom<GlobalPoint>(data[0], data[1]);
+        const _p2 = pointFrom<GlobalPoint>(data[2], data[3]);
+
+        const p1 = transformXY ? transformXY(_p1) : _p1;
+        const p2 = transformXY ? transformXY(_p2) : _p2;
+
+        const p0 = transformXY ? transformXY(currentP) : currentP;
+        currentP = _p2;
+
+        const [minX, minY, maxX, maxY] = getQuadraticBezierCurveBound(
+          p0,
+          p1,
+          p2,
+        );
+
+        limits.minX = Math.min(limits.minX, minX);
+        limits.minY = Math.min(limits.minY, minY);
+
+        limits.maxX = Math.max(limits.maxX, maxX);
+        limits.maxY = Math.max(limits.maxY, maxY);
       }
       return limits;
     },
