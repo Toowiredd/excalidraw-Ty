@@ -25,6 +25,7 @@ export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
   stroke?: (trail: AnimatedTrail) => string;
   animateTrail?: boolean;
+  trailAttributeName?: string;
 }
 
 export class AnimatedTrail implements Trail {
@@ -46,8 +47,10 @@ export class AnimatedTrail implements Trail {
     this.trailElement = document.createElementNS(SVG_NS, "path");
     if (this.options.animateTrail) {
       this.trailAnimation = document.createElementNS(SVG_NS, "animate");
-      // TODO: make this configurable
-      this.trailAnimation.setAttribute("attributeName", "stroke-dashoffset");
+      this.trailAnimation.setAttribute(
+        "attributeName",
+        this.options.trailAttributeName || "stroke-dashoffset",
+      );
       this.trailElement.setAttribute("stroke-dasharray", "7 7");
       this.trailElement.setAttribute("stroke-dashoffset", "10");
       this.trailAnimation.setAttribute("from", "0");
