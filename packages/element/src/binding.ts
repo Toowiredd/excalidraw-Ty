@@ -165,6 +165,39 @@ export const bindOrUnbindLinearElement = (
   });
 };
 
+/**
+ * Decides whether a linear element edge should be bound to a bindable element.
+ *
+ * It enforces the rule that simple arrows (2 points) cannot bind both ends to the same element,
+ * with the "start" binding taking precedence.
+ */
+const shouldBindLinearElementEdge = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  bindableElement: ExcalidrawBindableElement,
+  otherEdgeBindableElement: ExcalidrawBindableElement | null | "keep",
+  startOrEnd: "start" | "end",
+): boolean => {
+  if (!isLinearElementSimple(linearElement)) {
+    return true;
+  }
+
+  if (otherEdgeBindableElement == null) {
+    return true;
+  }
+
+  if (otherEdgeBindableElement === "keep") {
+    return !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
+      linearElement,
+      bindableElement,
+      startOrEnd,
+    );
+  }
+
+  return (
+    startOrEnd === "start" || otherEdgeBindableElement.id !== bindableElement.id
+  );
+};
+
 const bindOrUnbindLinearElementEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   bindableElement: ExcalidrawBindableElement | null | "keep",
@@ -190,26 +223,14 @@ const bindOrUnbindLinearElementEdge = (
     return;
   }
 
-  // While complext arrows can do anything, simple arrow with both ends trying
-  // to bind to the same bindable should not be allowed, start binding takes
-  // precedence
-  if (isLinearElementSimple(linearElement)) {
-    if (
-      otherEdgeBindableElement == null ||
-      (otherEdgeBindableElement === "keep"
-        ? // TODO: Refactor - Needlessly complex
-          !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-            linearElement,
-            bindableElement,
-            startOrEnd,
-          )
-        : startOrEnd === "start" ||
-          otherEdgeBindableElement.id !== bindableElement.id)
-    ) {
-      bindLinearElement(linearElement, bindableElement, startOrEnd, scene);
-      boundToElementIds.add(bindableElement.id);
-    }
-  } else {
+  if (
+    shouldBindLinearElementEdge(
+      linearElement,
+      bindableElement,
+      otherEdgeBindableElement,
+      startOrEnd,
+    )
+  ) {
     bindLinearElement(linearElement, bindableElement, startOrEnd, scene);
     boundToElementIds.add(bindableElement.id);
   }
