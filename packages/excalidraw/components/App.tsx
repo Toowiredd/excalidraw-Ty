@@ -3335,14 +3335,10 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    this.scene.replaceAllElements(nextElements);
-
+    const nextElementsMap = arrayToMap(nextElements);
     duplicatedElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
-        const container = getContainerElement(
-          newElement,
-          this.scene.getElementsMapIncludingDeleted(),
-        );
+        const container = getContainerElement(newElement, nextElementsMap);
         redrawTextBoundingBox(newElement, container, this.scene);
       }
     });
@@ -3358,14 +3354,12 @@ class App extends React.Component<AppProps, AppState> {
       this.addMissingFiles(opts.files);
     }
 
-    this.store.shouldCaptureIncrement();
-
     const nextElementsToSelect =
       excludeElementsInFramesFromSelection(duplicatedElements);
 
-    this.setState(
-      {
-        ...this.state,
+    this.updateScene({
+      elements: nextElements,
+      appState: {
         // keep sidebar (presumably the library) open if it's docked and
         // can fit.
         //
@@ -3395,12 +3389,12 @@ class App extends React.Component<AppProps, AppState> {
           this,
         ),
       },
-      () => {
-        if (opts.files) {
-          this.addNewImagesToImageCache();
-        }
-      },
-    );
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    if (opts.files) {
+      this.addNewImagesToImageCache();
+    }
     this.setActiveTool({ type: "selection" });
 
     if (opts.fitToContent) {
@@ -3595,13 +3589,15 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.scene.insertElements(textElements);
-
-    this.setState({
-      selectedElementIds: makeNextSelectedElementIds(
-        Object.fromEntries(textElements.map((el) => [el.id, true])),
-        this.state,
-      ),
+    this.updateScene({
+      elements: [...this.scene.getElementsIncludingDeleted(), ...textElements],
+      appState: {
+        selectedElementIds: makeNextSelectedElementIds(
+          Object.fromEntries(textElements.map((el) => [el.id, true])),
+          this.state,
+        ),
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
     if (
@@ -3618,8 +3614,6 @@ class App extends React.Component<AppProps, AppState> {
       });
       PLAIN_PASTE_TOAST_SHOWN = true;
     }
-
-    this.store.shouldCaptureIncrement();
   }
 
   setAppState: React.Component<any, AppState>["setState"] = (
@@ -9837,8 +9831,10 @@ class App extends React.Component<AppProps, AppState> {
     this.elementsPendingErasure = new Set();
 
     if (didChange) {
-      this.store.shouldCaptureIncrement();
-      this.scene.replaceAllElements(elements);
+      this.updateScene({
+        elements,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
     }
   };
 
