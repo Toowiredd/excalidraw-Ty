@@ -20,8 +20,24 @@ import { getDiamondPoints } from "./bounds";
 
 import type {
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+
+export const getCommonAttributeProperties = (element: ExcalidrawElement) => {
+  return {
+    width: element.width,
+    height: element.height,
+    roundness: element.roundness,
+    roughness: element.roughness,
+    backgroundColor: element.backgroundColor,
+    strokeColor: element.strokeColor,
+    strokeWidth: element.strokeWidth,
+    opacity: element.opacity,
+    fillStyle: element.fillStyle,
+    strokeStyle: element.strokeStyle,
+  };
+};
 
 /**
  * Get the building components of a rectanguloid element in the form of
