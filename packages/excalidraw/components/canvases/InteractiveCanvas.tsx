@@ -11,6 +11,8 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
+import { selectGroupsFromGivenElements } from "@excalidraw/element/groups";
+
 import { t } from "../../i18n";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
@@ -85,6 +87,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       new Map();
     const remoteSelectedElementIds: InteractiveCanvasRenderConfig["remoteSelectedElementIds"] =
       new Map();
+    const remoteSelectedGroupIds: InteractiveCanvasRenderConfig["remoteSelectedGroupIds"] =
+      new Map();
     const remotePointerUsernames: InteractiveCanvasRenderConfig["remotePointerUsernames"] =
       new Map();
     const remotePointerUserStates: InteractiveCanvasRenderConfig["remotePointerUserStates"] =
@@ -97,6 +101,30 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
             remoteSelectedElementIds.set(id, []);
           }
           remoteSelectedElementIds.get(id)!.push(socketId);
+        }
+
+        const selectedElements = Object.keys(user.selectedElementIds)
+          .map((id) => props.elementsMap.get(id))
+          .filter(
+            (element): element is NonDeletedExcalidrawElement => !!element,
+          );
+        const selectedGroupIds = selectGroupsFromGivenElements(
+          selectedElements,
+          {
+            ...props.appState,
+            editingGroupId: null,
+            selectedGroupIds: {},
+            selectedElementIds: {},
+          },
+        );
+
+        for (const [groupId, isSelected] of Object.entries(selectedGroupIds)) {
+          if (isSelected) {
+            if (!remoteSelectedGroupIds.has(groupId)) {
+              remoteSelectedGroupIds.set(groupId, []);
+            }
+            remoteSelectedGroupIds.get(groupId)!.push(socketId);
+          }
         }
       }
       if (!user.pointer || user.pointer.renderCursor === false) {
@@ -141,6 +169,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remotePointerViewportCoords,
           remotePointerButton,
           remoteSelectedElementIds,
+          remoteSelectedGroupIds,
           remotePointerUsernames,
           remotePointerUserStates,
           selectionColor,
