@@ -165,6 +165,12 @@ export const bindOrUnbindLinearElement = (
   });
 };
 
+/**
+ * Decides whether a linear element edge should be bound to a bindable element.
+ *
+ * It enforces the rule that simple arrows (2 points) cannot bind both ends to the same element,
+ * with the "start" binding taking precedence.
+ */
 const shouldBindLinearElementEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   bindableElement: ExcalidrawBindableElement,
@@ -217,9 +223,6 @@ const bindOrUnbindLinearElementEdge = (
     return;
   }
 
-  // While complext arrows can do anything, simple arrow with both ends trying
-  // to bind to the same bindable should not be allowed, start binding takes
-  // precedence
   if (
     shouldBindLinearElementEdge(
       linearElement,
