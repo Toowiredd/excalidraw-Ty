@@ -3,16 +3,20 @@ export class BinaryHeap<T> {
 
   constructor(private scoreFunction: (node: T) => number) {}
 
+  /**
+   * Sift-up logic: moves the node at `idx` up the tree until heap property is restored.
+   * Note: The method name `sinkDown` is legacy/inverted; it actually performs a "swim" or "sift up" operation.
+   */
   sinkDown(idx: number) {
     const node = this.content[idx];
     const score = this.scoreFunction(node);
 
     while (idx > 0) {
-      const parentN = ((idx + 1) >> 1) - 1;
-      const parent = this.content[parentN];
+      const parentIdx = ((idx + 1) >> 1) - 1;
+      const parent = this.content[parentIdx];
       if (score < this.scoreFunction(parent)) {
         this.content[idx] = parent;
-        idx = parentN;
+        idx = parentIdx;
       } else {
         break;
       }
@@ -20,30 +24,34 @@ export class BinaryHeap<T> {
     this.content[idx] = node;
   }
 
+  /**
+   * Sift-down logic: moves the node at `idx` down the tree until heap property is restored.
+   * Note: The method name `bubbleUp` is legacy/inverted; it actually performs a "sink" or "sift down" operation.
+   */
   bubbleUp(idx: number) {
     const length = this.content.length;
     const node = this.content[idx];
     const score = this.scoreFunction(node);
 
     while (true) {
-      const child2N = (idx + 1) << 1;
-      const child1N = child2N - 1;
-      let swap = null;
+      const child2Idx = (idx + 1) << 1;
+      const child1Idx = child2Idx - 1;
+      let swap: number | null = null;
       let child1Score = 0;
 
-      if (child1N < length) {
-        const child1 = this.content[child1N];
+      if (child1Idx < length) {
+        const child1 = this.content[child1Idx];
         child1Score = this.scoreFunction(child1);
         if (child1Score < score) {
-          swap = child1N;
+          swap = child1Idx;
         }
       }
 
-      if (child2N < length) {
-        const child2 = this.content[child2N];
+      if (child2Idx < length) {
+        const child2 = this.content[child2Idx];
         const child2Score = this.scoreFunction(child2);
         if (child2Score < (swap === null ? score : child1Score)) {
-          swap = child2N;
+          swap = child2Idx;
         }
       }
 

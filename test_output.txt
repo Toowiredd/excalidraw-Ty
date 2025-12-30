@@ -7,8 +7,8 @@ $ vitest packages/common/src/binary-heap.test.ts
 
  Test Files  1 passed (1)
       Tests  4 passed (4)
-   Start at  09:55:09
-   Duration  1.97s (transform 171ms, setup 322ms, collect 33ms, tests 10ms, environment 796ms, prepare 276ms)
+   Start at  11:04:03
+   Duration  2.54s (transform 187ms, setup 522ms, collect 41ms, tests 10ms, environment 1.11s, prepare 219ms)
 
  PASS  Waiting for file changes...
        press h to show help, press q to quit
