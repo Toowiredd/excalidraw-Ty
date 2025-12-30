@@ -78,18 +78,19 @@ const toContiguousGroups = (array: number[]) => {
  * If no binding present, returns `undefined`.
  */
 const getTargetIndexAccountingForBinding = (
-  nextElement: ExcalidrawElement,
   elements: readonly ExcalidrawElement[],
+  nextElementIndex: number,
   direction: "left" | "right",
 ) => {
+  const nextElement = elements[nextElementIndex];
   if ("containerId" in nextElement && nextElement.containerId) {
     const containerIndex = elements.findIndex(
       (element) => element.id === nextElement.containerId,
     );
     if (containerIndex > -1) {
       return direction === "left"
-        ? Math.min(containerIndex, elements.indexOf(nextElement))
-        : Math.max(containerIndex, elements.indexOf(nextElement));
+        ? Math.min(containerIndex, nextElementIndex)
+        : Math.max(containerIndex, nextElementIndex);
     }
   } else {
     const boundElementId = nextElement.boundElements?.find(
@@ -101,8 +102,8 @@ const getTargetIndexAccountingForBinding = (
       );
       if (boundTextIndex > -1) {
         return direction === "left"
-          ? Math.min(boundTextIndex, elements.indexOf(nextElement))
-          : Math.max(boundTextIndex, elements.indexOf(nextElement));
+          ? Math.min(boundTextIndex, nextElementIndex)
+          : Math.max(boundTextIndex, nextElementIndex);
       }
     }
   }
@@ -182,8 +183,8 @@ const getTargetIndex = (
     ) {
       return (
         getTargetIndexAccountingForBinding(
-          nextElement,
           elements,
+          candidateIndex,
           direction,
         ) ?? candidateIndex
       );
@@ -209,8 +210,8 @@ const getTargetIndex = (
   if (!nextElement.groupIds.length) {
     return (
       getTargetIndexAccountingForBinding(
-        nextElement,
         elements,
+        candidateIndex,
         direction,
       ) ?? candidateIndex
     );
