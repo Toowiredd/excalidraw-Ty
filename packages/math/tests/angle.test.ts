@@ -22,4 +22,9 @@ describe("normalizeRadians", () => {
     expect(normalizeRadians((4 * Math.PI) as Radians)).toBeCloseTo(0);
     expect(normalizeRadians((5 * Math.PI) as Radians)).toBeCloseTo(Math.PI);
   });
+
+  it("should handle signed zero", () => {
+    expect(normalizeRadians(-0 as Radians)).toBeCloseTo(0);
+    expect(normalizeRadians(+0 as Radians)).toBeCloseTo(0);
+  });
 });
