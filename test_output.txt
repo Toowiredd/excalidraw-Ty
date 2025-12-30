@@ -1,0 +1,16 @@
+yarn run v1.22.22
+$ vitest packages/common/src/binary-heap.test.ts
+
+ DEV  v3.0.6 /app
+
+ ✓ packages/common/src/binary-heap.test.ts (4 tests) 10ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  11:04:03
+   Duration  2.54s (transform 187ms, setup 522ms, collect 41ms, tests 10ms, environment 1.11s, prepare 219ms)
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+error Command failed with signal "SIGTERM".
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
