@@ -586,6 +586,9 @@ export const getMinMaxXYFromCurvePathOps = (
   transformXY?: (p: GlobalPoint) => GlobalPoint,
 ): Bounds => {
   let currentP: GlobalPoint = pointFrom(0, 0);
+  let currentPTransformed: GlobalPoint = transformXY
+    ? transformXY(currentP)
+    : currentP;
 
   const { minX, minY, maxX, maxY } = ops.reduce(
     (limits, { op, data }) => {
@@ -596,6 +599,7 @@ export const getMinMaxXYFromCurvePathOps = (
         const p: GlobalPoint | undefined = pointFromArray(data);
         invariant(p != null, "Op data is not a point");
         currentP = p;
+        currentPTransformed = transformXY ? transformXY(p) : p;
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
@@ -607,8 +611,9 @@ export const getMinMaxXYFromCurvePathOps = (
         const p2 = transformXY ? transformXY(_p2) : _p2;
         const p3 = transformXY ? transformXY(_p3) : _p3;
 
-        const p0 = transformXY ? transformXY(currentP) : currentP;
+        const p0 = currentPTransformed;
         currentP = _p3;
+        currentPTransformed = p3;
 
         const [minX, minY, maxX, maxY] = getCubicBezierCurveBound(
           p0,
@@ -623,9 +628,52 @@ export const getMinMaxXYFromCurvePathOps = (
         limits.maxX = Math.max(limits.maxX, maxX);
         limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
-        // TODO: Implement this
+        const _p = pointFrom<GlobalPoint>(data[0], data[1]);
+        const p = transformXY ? transformXY(_p) : _p;
+        const p0 = currentPTransformed;
+        currentP = _p;
+        currentPTransformed = p;
+
+        limits.minX = Math.min(limits.minX, p0[0], p[0]);
+        limits.minY = Math.min(limits.minY, p0[1], p[1]);
+
+        limits.maxX = Math.max(limits.maxX, p0[0], p[0]);
+        limits.maxY = Math.max(limits.maxY, p0[1], p[1]);
       } else if (op === "qcurveTo") {
-        // TODO: Implement this
+        const _p1 = pointFrom<GlobalPoint>(data[0], data[1]);
+        const _p2 = pointFrom<GlobalPoint>(data[2], data[3]);
+
+        const p1 = transformXY ? transformXY(_p1) : _p1;
+        const p2 = transformXY ? transformXY(_p2) : _p2;
+
+        const p0 = currentPTransformed;
+        currentP = _p2;
+        currentPTransformed = p2;
+
+        // Quadratic bezier curve can be converted to cubic bezier curve
+        // C1 = P0 + 2/3 (P1 - P0) = 1/3 P0 + 2/3 P1
+        // C2 = P2 + 2/3 (P1 - P2) = 1/3 P2 + 2/3 P1
+        const cubicP1 = pointFrom<GlobalPoint>(
+          (1 / 3) * p0[0] + (2 / 3) * p1[0],
+          (1 / 3) * p0[1] + (2 / 3) * p1[1],
+        );
+        const cubicP2 = pointFrom<GlobalPoint>(
+          (1 / 3) * p2[0] + (2 / 3) * p1[0],
+          (1 / 3) * p2[1] + (2 / 3) * p1[1],
+        );
+
+        const [minX, minY, maxX, maxY] = getCubicBezierCurveBound(
+          p0,
+          cubicP1,
+          cubicP2,
+          p2,
+        );
+
+        limits.minX = Math.min(limits.minX, minX);
+        limits.minY = Math.min(limits.minY, minY);
+
+        limits.maxX = Math.max(limits.maxX, maxX);
+        limits.maxY = Math.max(limits.maxY, maxY);
       }
       return limits;
     },
