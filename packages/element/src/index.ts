@@ -54,11 +54,17 @@ export const isNonDeletedElement = <T extends ExcalidrawElement>(
 const _clearElements = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] =>
-  getNonDeletedElements(elements).map((element) =>
-    isLinearElementType(element.type)
-      ? { ...element, lastCommittedPoint: null }
-      : element,
-  );
+  getNonDeletedElements(elements).reduce((acc, element) => {
+    if (isInvisiblySmallElement(element)) {
+      return acc;
+    }
+    acc.push(
+      isLinearElementType(element.type)
+        ? { ...element, lastCommittedPoint: null }
+        : element,
+    );
+    return acc;
+  }, [] as ExcalidrawElement[]);
 
 export const clearElementsForDatabase = (
   elements: readonly ExcalidrawElement[],

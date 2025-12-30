@@ -10,9 +10,6 @@ import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
-// TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
-//        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
-//        - could also be part of `_clearElements`
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
