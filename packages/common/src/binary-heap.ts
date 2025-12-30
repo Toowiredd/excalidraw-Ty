@@ -3,22 +3,33 @@ export class BinaryHeap<T> {
 
   constructor(private scoreFunction: (node: T) => number) {}
 
-  sinkDown(idx: number) {
+  /**
+   * Moves the node at the given index up the heap until it finds its correct position.
+   * (Standard "bubble up" or "sift up" operation)
+   */
+  private bubbleUp(idx: number) {
     const node = this.content[idx];
+    const score = this.scoreFunction(node);
+
     while (idx > 0) {
       const parentN = ((idx + 1) >> 1) - 1;
       const parent = this.content[parentN];
-      if (this.scoreFunction(node) < this.scoreFunction(parent)) {
-        this.content[parentN] = node;
+
+      if (score < this.scoreFunction(parent)) {
         this.content[idx] = parent;
-        idx = parentN; // TODO: Optimize
+        idx = parentN;
       } else {
         break;
       }
     }
+    this.content[idx] = node;
   }
 
-  bubbleUp(idx: number) {
+  /**
+   * Moves the node at the given index down the heap until it finds its correct position.
+   * (Standard "sink down" or "sift down" operation)
+   */
+  private sinkDown(idx: number) {
     const length = this.content.length;
     const node = this.content[idx];
     const score = this.scoreFunction(node);
@@ -47,17 +58,18 @@ export class BinaryHeap<T> {
 
       if (swap !== null) {
         this.content[idx] = this.content[swap];
-        this.content[swap] = node;
-        idx = swap; // TODO: Optimize
+        idx = swap;
       } else {
         break;
       }
     }
+
+    this.content[idx] = node;
   }
 
   push(node: T) {
     this.content.push(node);
-    this.sinkDown(this.content.length - 1);
+    this.bubbleUp(this.content.length - 1);
   }
 
   pop(): T | null {
@@ -70,7 +82,7 @@ export class BinaryHeap<T> {
 
     if (this.content.length > 0) {
       this.content[0] = end;
-      this.bubbleUp(0);
+      this.sinkDown(0);
     }
 
     return result;
@@ -88,9 +100,9 @@ export class BinaryHeap<T> {
       this.content[i] = end;
 
       if (this.scoreFunction(end) < this.scoreFunction(node)) {
-        this.sinkDown(i);
-      } else {
         this.bubbleUp(i);
+      } else {
+        this.sinkDown(i);
       }
     }
   }
@@ -100,6 +112,6 @@ export class BinaryHeap<T> {
   }
 
   rescoreElement(node: T) {
-    this.sinkDown(this.content.indexOf(node));
+    this.bubbleUp(this.content.indexOf(node));
   }
 }
