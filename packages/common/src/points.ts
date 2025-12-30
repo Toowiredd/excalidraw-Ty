@@ -64,7 +64,6 @@ export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
   return nextPoints;
 };
 
-// TODO: Rounding this point causes some shake when free drawing
 export const getGridPoint = (
   x: number,
   y: number,
@@ -72,8 +71,8 @@ export const getGridPoint = (
 ): [number, number] => {
   if (gridSize) {
     return [
-      Math.round(x / gridSize) * gridSize,
-      Math.round(y / gridSize) * gridSize,
+      Math.round(Math.round(x) / gridSize) * gridSize,
+      Math.round(Math.round(y) / gridSize) * gridSize,
     ];
   }
   return [x, y];
