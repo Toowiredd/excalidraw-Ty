@@ -1,0 +1,30 @@
+yarn run v1.22.22
+$ tsc
+excalidraw-app/collab/Collab.tsx(371,36): error TS2339: Property 'fallbackInitializationHandler' does not exist on type 'Collab'.
+excalidraw-app/collab/Collab.tsx(374,14): error TS2339: Property 'fallbackInitializationHandler' does not exist on type 'Collab'.
+excalidraw-app/collab/Collab.tsx(995,28): error TS2304: Cannot find name 'AIService'.
+excalidraw-app/collab/Collab.tsx(1004,28): error TS2304: Cannot find name 'AIService'.
+excalidraw-app/components/AppMainMenu.tsx(95,29): error TS2339: Property 'toggleAIToolsVisibility' does not exist on type 'Window & typeof globalThis'.
+excalidraw-app/components/AppMainMenu.tsx(96,20): error TS2339: Property 'toggleAIToolsVisibility' does not exist on type 'Window & typeof globalThis'.
+excalidraw-app/components/AppWelcomeScreen.tsx(46,28): error TS2339: Property 'CustomHint' does not exist on type '{ MenuHint: { ({ children }: { children?: ReactNode; }): Element; displayName: string; }; ToolbarHint: { ({ children }: { children?: ReactNode; }): Element; displayName: string; }; HelpHint: { ...; }; }'.
+excalidraw-app/components/AppWelcomeScreen.tsx(47,12): error TS2345: Argument of type '"welcomeScreen.app.customHint"' is not assignable to parameter of type '"search" | "toast" | "stats" | "element" | "commandPalette" | "welcomeScreen" | "library" | "elementLink" | "mermaid" | "labels" | "buttons" | "alerts" | "errors" | "toolBar" | ... 561 more ... | "userList.hint.micMuted"'.
+excalidraw-app/components/AppWelcomeScreen.tsx(48,29): error TS2339: Property 'CustomHint' does not exist on type '{ MenuHint: { ({ children }: { children?: ReactNode; }): Element; displayName: string; }; ToolbarHint: { ({ children }: { children?: ReactNode; }): Element; displayName: string; }; HelpHint: { ...; }; }'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirm.tsx(26,7): error TS2322: Type '{ children: Element; isOpen: boolean; onCloseRequest: () => void; title: string; }' is not assignable to type 'IntrinsicAttributes & DialogProps'.
+  Property 'isOpen' does not exist on type 'IntrinsicAttributes & DialogProps'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirm.tsx(28,16): error TS2345: Argument of type '"overwriteConfirm.title"' is not assignable to parameter of type '"search" | "toast" | "stats" | "element" | "commandPalette" | "welcomeScreen" | "library" | "elementLink" | "mermaid" | "labels" | "buttons" | "alerts" | "errors" | "toolBar" | ... 561 more ... | "userList.hint.micMuted"'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirm.tsx(32,14): error TS2345: Argument of type '"overwriteConfirm.description"' is not assignable to parameter of type '"search" | "toast" | "stats" | "element" | "commandPalette" | "welcomeScreen" | "library" | "elementLink" | "mermaid" | "labels" | "buttons" | "alerts" | "errors" | "toolBar" | ... 561 more ... | "userList.hint.micMuted"'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirm.tsx(35,20): error TS2345: Argument of type '"overwriteConfirm.inputLabel"' is not assignable to parameter of type '"search" | "toast" | "stats" | "element" | "commandPalette" | "welcomeScreen" | "library" | "elementLink" | "mermaid" | "labels" | "buttons" | "alerts" | "errors" | "toolBar" | ... 561 more ... | "userList.hint.micMuted"'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirm.tsx(38,48): error TS2339: Property 'target' does not exist on type 'string'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirm.tsx(46,22): error TS2345: Argument of type '"overwriteConfirm.cancelButton"' is not assignable to parameter of type '"search" | "toast" | "stats" | "element" | "commandPalette" | "welcomeScreen" | "library" | "elementLink" | "mermaid" | "labels" | "buttons" | "alerts" | "errors" | "toolBar" | ... 561 more ... | "userList.hint.micMuted"'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirm.tsx(51,22): error TS2345: Argument of type '"overwriteConfirm.confirmButton"' is not assignable to parameter of type '"search" | "toast" | "stats" | "element" | "commandPalette" | "welcomeScreen" | "library" | "elementLink" | "mermaid" | "labels" | "buttons" | "alerts" | "errors" | "toolBar" | ... 561 more ... | "userList.hint.micMuted"'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirmState.ts(9,42): error TS7006: Parameter 'newState' implicitly has an 'any' type.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirmState.ts(10,29): error TS2339: Property 'update' does not exist on type 'PrimitiveAtom<{ isOpen: boolean; inputValue: string; aiToolData: null; }> & WithInitialValue<{ isOpen: boolean; inputValue: string; aiToolData: null; }>'.
+excalidraw-app/components/OverwriteConfirm/OverwriteConfirmState.ts(10,37): error TS7006: Parameter 'state' implicitly has an 'any' type.
+excalidraw-app/components/ShareableLinkDialog.tsx(32,67): error TS2345: Argument of type '"labels.shareableLink"' is not assignable to parameter of type '"search" | "toast" | "stats" | "element" | "commandPalette" | "welcomeScreen" | "library" | "elementLink" | "mermaid" | "labels" | "buttons" | "alerts" | "errors" | "toolBar" | ... 561 more ... | "userList.hint.micMuted"'.
+excalidraw-app/components/ShareableLinkDialog.tsx(37,11): error TS2322: Type '{ label: string; value: string; readOnly: true; fullWidth: true; }' is not assignable to type 'IntrinsicAttributes & (TextFieldProps & RefAttributes<HTMLInputElement>)'.
+  Property 'readOnly' does not exist on type 'IntrinsicAttributes & (TextFieldProps & RefAttributes<HTMLInputElement>)'. Did you mean 'readonly'?
+excalidraw-app/services/aiService.ts(15,48): error TS18046: 'error' is of type 'unknown'.
+excalidraw-app/services/aiService.ts(30,45): error TS18046: 'error' is of type 'unknown'.
+excalidraw-app/services/aiService.ts(57,23): error TS18046: 'error' is of type 'unknown'.
+excalidraw-app/services/aiService.ts(94,23): error TS18046: 'error' is of type 'unknown'.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

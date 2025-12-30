@@ -11,7 +11,6 @@ import { syncMovedIndices } from "./fractionalIndex";
 import { getSelectedElements } from "./selection";
 
 import type Scene from "./Scene";
-
 import type { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./types";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
@@ -82,38 +81,28 @@ const getTargetIndexAccountingForBinding = (
   nextElement: ExcalidrawElement,
   elements: readonly ExcalidrawElement[],
   direction: "left" | "right",
-  scene: Scene,
 ) => {
   if ("containerId" in nextElement && nextElement.containerId) {
-    // TODO: why not to get the container from the nextElements?
-    const containerElement = scene.getElement(nextElement.containerId);
-    if (containerElement) {
+    const containerIndex = elements.findIndex(
+      (element) => element.id === nextElement.containerId,
+    );
+    if (containerIndex > -1) {
       return direction === "left"
-        ? Math.min(
-            elements.indexOf(containerElement),
-            elements.indexOf(nextElement),
-          )
-        : Math.max(
-            elements.indexOf(containerElement),
-            elements.indexOf(nextElement),
-          );
+        ? Math.min(containerIndex, elements.indexOf(nextElement))
+        : Math.max(containerIndex, elements.indexOf(nextElement));
     }
   } else {
     const boundElementId = nextElement.boundElements?.find(
       (binding) => binding.type !== "arrow",
     )?.id;
     if (boundElementId) {
-      const boundTextElement = scene.getElement(boundElementId);
-      if (boundTextElement) {
+      const boundTextIndex = elements.findIndex(
+        (element) => element.id === boundElementId,
+      );
+      if (boundTextIndex > -1) {
         return direction === "left"
-          ? Math.min(
-              elements.indexOf(boundTextElement),
-              elements.indexOf(nextElement),
-            )
-          : Math.max(
-              elements.indexOf(boundTextElement),
-              elements.indexOf(nextElement),
-            );
+          ? Math.min(boundTextIndex, elements.indexOf(nextElement))
+          : Math.max(boundTextIndex, elements.indexOf(nextElement));
       }
     }
   }
@@ -153,7 +142,6 @@ const getTargetIndex = (
    * If whole frame (including all children) is being moved, supply `null`.
    */
   containingFrame: ExcalidrawFrameLikeElement["id"] | null,
-  scene: Scene,
 ) => {
   const sourceElement = elements[boundaryIndex];
 
@@ -197,7 +185,6 @@ const getTargetIndex = (
           nextElement,
           elements,
           direction,
-          scene,
         ) ?? candidateIndex
       );
     } else if (!nextElement?.groupIds.includes(appState.editingGroupId)) {
@@ -225,7 +212,6 @@ const getTargetIndex = (
         nextElement,
         elements,
         direction,
-        scene,
       ) ?? candidateIndex
     );
   }
@@ -266,7 +252,6 @@ const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
-  scene: Scene,
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
@@ -301,7 +286,6 @@ const shiftElementsByOne = (
       boundaryIndex,
       direction,
       containingFrame,
-      scene,
     );
 
     if (targetIndex === -1 || boundaryIndex === targetIndex) {
@@ -517,7 +501,7 @@ export const moveOneLeft = (
   appState: AppState,
   scene: Scene,
 ) => {
-  return shiftElementsByOne(allElements, appState, "left", scene);
+  return shiftElementsByOne(allElements, appState, "left");
 };
 
 export const moveOneRight = (
@@ -525,7 +509,7 @@ export const moveOneRight = (
   appState: AppState,
   scene: Scene,
 ) => {
-  return shiftElementsByOne(allElements, appState, "right", scene);
+  return shiftElementsByOne(allElements, appState, "right");
 };
 
 export const moveAllLeft = (
