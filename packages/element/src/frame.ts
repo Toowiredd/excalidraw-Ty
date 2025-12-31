@@ -9,6 +9,8 @@ import type {
   StaticCanvasAppState,
 } from "@excalidraw/excalidraw/types";
 
+import type { GroupId } from "./types";
+
 import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
 import { getElementsWithinSelection, getSelectedElements } from "./selection";
@@ -727,7 +729,7 @@ export const omitGroupsContainingFrameLikes = (
 export const getTargetFrame = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState & { editingGroupId?: GroupId | null },
 ) => {
   const _element = isTextElement(element)
     ? getContainerElement(element, elementsMap) || element
@@ -754,7 +756,7 @@ export const getTargetFrame = (
 export const isElementInFrame = (
   element: ExcalidrawElement,
   allElementsMap: ElementsMap,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState & { editingGroupId?: GroupId | null },
   opts?: {
     targetFrame?: ExcalidrawFrameLikeElement;
     checkedGroups?: Map<string, boolean>;
@@ -848,7 +850,7 @@ export const isElementInFrame = (
 export const shouldApplyFrameClip = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState & { editingGroupId?: GroupId | null },
   elementsMap: ElementsMap,
   checkedGroups?: Map<string, boolean>,
 ) => {
