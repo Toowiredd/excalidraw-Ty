@@ -110,7 +110,6 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     frameRendering: appState.frameRendering,
     selectedElementIds: appState.selectedElementIds,
     frameToHighlight: appState.frameToHighlight,
-    editingGroupId: appState.editingGroupId,
     currentHoveredFontFamily: appState.currentHoveredFontFamily,
     croppingElementId: appState.croppingElementId,
   };
