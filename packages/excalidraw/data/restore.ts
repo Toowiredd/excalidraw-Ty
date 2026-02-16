@@ -49,6 +49,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
+  Arrowhead,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
@@ -240,6 +241,46 @@ const restoreElementWithProperties = <
   return ret;
 };
 
+const restoreLinearElementProperties = (
+  element: ExcalidrawLinearElement | (ExcalidrawElement & { type: "draw" }),
+): {
+  startBinding: ReturnType<typeof repairBinding>;
+  endBinding: ReturnType<typeof repairBinding>;
+  points: readonly LocalPoint[];
+  lastCommittedPoint: null;
+  x: number;
+  y: number;
+  startArrowhead: Arrowhead | null;
+  endArrowhead: Arrowhead | null;
+} & ReturnType<typeof getSizeFromPoints> => {
+  const {
+    startArrowhead = null,
+    endArrowhead = element.type === "arrow" ? "arrow" : null,
+  } = element;
+  let x = element.x;
+  let y = element.y;
+  let points = // migrate old arrow model to new one
+    !Array.isArray(element.points) || element.points.length < 2
+      ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
+      : element.points;
+
+  if (points[0][0] !== 0 || points[0][1] !== 0) {
+    ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+  }
+
+  return {
+    startBinding: repairBinding(element, element.startBinding),
+    endBinding: repairBinding(element, element.endBinding),
+    lastCommittedPoint: null,
+    startArrowhead,
+    endArrowhead,
+    points,
+    x,
+    y,
+    ...getSizeFromPoints(points),
+  };
+};
+
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 ): typeof element | null => {
@@ -314,72 +355,30 @@ const restoreElement = (
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
     case "draw":
-      const { startArrowhead = null, endArrowhead = null } = element;
-      let x = element.x;
-      let y = element.y;
-      let points = // migrate old arrow model to new one
-        !Array.isArray(element.points) || element.points.length < 2
-          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
-          : element.points;
-
-      if (points[0][0] !== 0 || points[0][1] !== 0) {
-        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
-      }
-
       return restoreElementWithProperties(element, {
         type:
           (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
-        startBinding: repairBinding(element, element.startBinding),
-        endBinding: repairBinding(element, element.endBinding),
-        lastCommittedPoint: null,
-        startArrowhead,
-        endArrowhead,
-        points,
-        x,
-        y,
-        ...getSizeFromPoints(points),
+        ...restoreLinearElementProperties(element),
       });
     case "arrow": {
-      const { startArrowhead = null, endArrowhead = "arrow" } = element;
-      let x: number | undefined = element.x;
-      let y: number | undefined = element.y;
-      let points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
-        !Array.isArray(element.points) || element.points.length < 2
-          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
-          : element.points;
+      const commonProps = restoreLinearElementProperties(element);
 
-      if (points[0][0] !== 0 || points[0][1] !== 0) {
-        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+      if (isElbowArrow(element)) {
+        return restoreElementWithProperties(element, {
+          ...commonProps,
+          elbowed: true,
+          fixedSegments: element.fixedSegments,
+          startIsSpecial: element.startIsSpecial,
+          endIsSpecial: element.endIsSpecial,
+        });
       }
 
-      const base = {
-        type: element.type,
-        startBinding: repairBinding(element, element.startBinding),
-        endBinding: repairBinding(element, element.endBinding),
-        lastCommittedPoint: null,
-        startArrowhead,
-        endArrowhead,
-        points,
-        x,
-        y,
-        elbowed: (element as ExcalidrawArrowElement).elbowed,
-        ...getSizeFromPoints(points),
-      } as const;
-
-      // TODO: Separate arrow from linear element
-      return isElbowArrow(element)
-        ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
-            ...base,
-            elbowed: true,
-            startBinding: repairBinding(element, element.startBinding),
-            endBinding: repairBinding(element, element.endBinding),
-            fixedSegments: element.fixedSegments,
-            startIsSpecial: element.startIsSpecial,
-            endIsSpecial: element.endIsSpecial,
-          })
-        : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
+      return restoreElementWithProperties(element, {
+        ...commonProps,
+        elbowed: element.elbowed ?? false,
+      });
     }
 
     // generic elements
