@@ -375,26 +375,29 @@ export const getSuggestedBindingsForArrows = (
     return [];
   }
 
-  return (
-    selectedElements
-      .filter(isLinearElement)
-      .flatMap((element) =>
-        getOriginalBindingsIfStillCloseToArrowEnds(element, elementsMap, zoom),
-      )
-      .filter(
-        (element): element is NonDeleted<ExcalidrawBindableElement> =>
-          element !== null,
-      )
-      // Filter out bind candidates which are in the
-      // same selection / group with the arrow
-      //
-      // TODO: Is it worth turning the list into a set to avoid dupes?
-      .filter(
-        (element) =>
-          selectedElements.filter((selected) => selected.id === element?.id)
-            .length === 0,
-      )
-  );
+  const selectedElementIds = new Set(selectedElements.map((e) => e.id));
+  const suggestedBindings = new Set<NonDeleted<ExcalidrawBindableElement>>();
+
+  for (const element of selectedElements) {
+    if (isLinearElement(element)) {
+      const bindings = getOriginalBindingsIfStillCloseToArrowEnds(
+        element,
+        elementsMap,
+        zoom,
+      );
+      for (const binding of bindings) {
+        if (
+          binding !== null &&
+          isBindableElement(binding) &&
+          !selectedElementIds.has(binding.id)
+        ) {
+          suggestedBindings.add(binding as NonDeleted<ExcalidrawBindableElement>);
+        }
+      }
+    }
+  }
+
+  return Array.from(suggestedBindings);
 };
 
 export const maybeBindLinearElement = (
