@@ -5,8 +5,11 @@ import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import * as sizeHelpers from "@excalidraw/element/sizeHelpers";
+import { isElbowArrow } from "@excalidraw/element/typeChecks";
 
 import type {
+  ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -816,5 +819,59 @@ describe("repairing bindings", () => {
         containerId: null,
       }),
     ]);
+  });
+});
+
+describe("restoreElements - Arrow Refactor", () => {
+  it("should restore regular arrow element correctly", () => {
+    const arrowElement = API.createElement({
+      type: "arrow",
+      id: "regular-arrow",
+      elbowed: false,
+      points: [pointFrom(0, 0), pointFrom(100, 100)],
+    });
+
+    const restoredElements = restore.restoreElements([arrowElement], null);
+    const restoredArrow = restoredElements[0] as ExcalidrawArrowElement;
+
+    expect(restoredArrow.type).toBe("arrow");
+    expect(restoredArrow.id).toBe("regular-arrow");
+    expect(restoredArrow.elbowed).toBe(false);
+    expect(isElbowArrow(restoredArrow)).toBe(false);
+    expect(restoredArrow.points).toEqual(arrowElement.points);
+  });
+
+  it("should restore elbow arrow element correctly", () => {
+    const elbowArrowElement = API.createElement({
+      type: "arrow",
+      id: "elbow-arrow",
+      elbowed: true,
+      points: [pointFrom(0, 0), pointFrom(50, 0), pointFrom(50, 100), pointFrom(100, 100)],
+    });
+
+    const restoredElements = restore.restoreElements([elbowArrowElement], null);
+    const restoredArrow = restoredElements[0] as ExcalidrawElbowArrowElement;
+
+    expect(restoredArrow.type).toBe("arrow");
+    expect(restoredArrow.id).toBe("elbow-arrow");
+    expect(restoredArrow.elbowed).toBe(true);
+    expect(isElbowArrow(restoredArrow)).toBe(true);
+    expect(restoredArrow.points).toEqual(elbowArrowElement.points);
+  });
+
+  it("should restore line element correctly", () => {
+    const lineElement = API.createElement({
+        type: "line",
+        id: "line",
+        points: [pointFrom(0, 0), pointFrom(100, 100)],
+    });
+
+    const restoredElements = restore.restoreElements([lineElement], null);
+    const restoredLine = restoredElements[0] as ExcalidrawLinearElement;
+
+    expect(restoredLine.type).toBe("line");
+    expect(restoredLine.id).toBe("line");
+    expect((restoredLine as any).elbowed).toBeUndefined();
+    expect(restoredLine.points).toEqual(lineElement.points);
   });
 });
